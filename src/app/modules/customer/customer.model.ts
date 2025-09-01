@@ -37,6 +37,7 @@ const CustomerModelSchema = new Schema<Customer>(
     password: {
       type: String,
       minLength: 1,
+      select:false,
       trim: true,
       default: null,
     },
@@ -66,5 +67,5 @@ const CustomerModelSchema = new Schema<Customer>(
   }
 );
 
-const CustomerModel = model<Customer>('Wallet', CustomerModelSchema);
+const CustomerModel = model<Customer>("Customer", CustomerModelSchema);
 export default CustomerModel;

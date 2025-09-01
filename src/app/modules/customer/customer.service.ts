@@ -1,11 +1,16 @@
-import { startSession } from 'mongoose';
+import { startSession, Types } from 'mongoose';
 import AppError from '../../Errors/AppError';
 import httpStatus from '../../shared/http-status';
-import { CreateCustomerPayload } from './customer.interface';
+import { CreateCustomerPayload, IChangeCustomerStatusPayload, ICustomersFilterPayload } from './customer.interface';
 import CustomerModel from './customer.model';
 import bcrypt from 'bcrypt';
 import WalletModel from '../wallet/wallet.model';
+import { IPaginationOptions } from '../../types';
+import { calculatePagination } from '../../helpers/paginationHelper';
+import { objectId } from '../../helpers';
+import { AccountStatus } from '../User/user.interface';
 class CustomerService {
+  
   async createCustomer(payload: CreateCustomerPayload) {
     const { fullName, email, password, googleId, facebookId } = payload;
 
@@ -60,6 +65,90 @@ class CustomerService {
     }
    
   }
+
+  async getCustomersFromDB (payload:ICustomersFilterPayload,paginationOptions:IPaginationOptions){
+      const {searchTerm,...otherFilterPayload} = payload 
+
+      let whereConditions:any =  {}
+      if(searchTerm) {
+       if (Types.ObjectId.isValid(searchTerm)){
+        whereConditions._id = searchTerm
+       }
+       else {
+        whereConditions.$or = [
+          {
+            name:searchTerm
+          },
+          {
+            email:searchTerm
+          }
+        ]
+       }
+      }
+      else if (Object.keys(otherFilterPayload).length) {
+       whereConditions = otherFilterPayload
+      }
+
+
+      const {page,limit,skip,sortBy,sortOrder} = calculatePagination(paginationOptions,{limitOverride:20})
+
+
+      const customers  = await  CustomerModel.find(whereConditions).sort({[sortBy]:sortOrder}).skip(skip).limit(limit)
+      
+
+      const totalResults =  await CustomerModel.countDocuments(whereConditions)
+
+      const total =  await  CustomerModel.countDocuments()
+
+
+    return {
+      data:customers,
+      meta:{
+        page,
+        limit,
+        totalResults,
+        total
+      }
+    }
+
+  }
+
+  async getCustomerByIdFromDB (id:string){
+    // validate id 
+    if(!Types.ObjectId.isValid(id)) throw new AppError(httpStatus.BAD_REQUEST,"Invalid id");
+
+    // Fetch data 
+    const customer = await CustomerModel.findOne({_id:objectId(id),status:{$not:AccountStatus.DELETED}})
+
+    // Check existence
+    if(!customer) throw new AppError(httpStatus.NOT_FOUND,"Customer not found");
+
+    return  customer
+  }
+
+  async changeUserStatus (payload:IChangeCustomerStatusPayload) {
+    const {id,status} = payload
+
+     // validate id 
+    if(!Types.ObjectId.isValid(id)) throw new AppError(httpStatus.BAD_REQUEST,"Invalid id");
+     
+    // Validate status
+    if( !Object.values(AccountStatus).includes(status) || status === AccountStatus.DELETED) {
+       throw new AppError(httpStatus.BAD_REQUEST,"Invalid status")
+    }
+
+    // Fetch data 
+    const customer = await CustomerModel.findOne({_id:objectId(id),status:{$not:AccountStatus.DELETED}})
+
+    // Check existence
+    if(!customer) throw new AppError(httpStatus.NOT_FOUND,"Customer not found");
+      
+
+    await CustomerModel.updateOne({
+      _id:customer._id,
+    },{status})
+  }
+
 }
 
 export default new CustomerService();
