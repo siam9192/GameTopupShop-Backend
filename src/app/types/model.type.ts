@@ -35,3 +35,8 @@ export type TContactInfo = {
   emailAddress: string;
   phoneNumber: string;
 };
+
+export type Name = {
+  first: string;
+  last: string;
+};

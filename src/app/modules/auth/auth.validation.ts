@@ -7,7 +7,10 @@ const ChangePasswordValidation = z.object({
     .max(32, { message: 'Password must be at least 6 characters and Maximum 32 characters longs' }),
 });
 const customerSignupValidation = z.object({
-  fullName: z.string().nonempty().max(50),
+  name: z.object({
+    first: z.string().nonempty().max(25),
+    last: z.string().nonempty().max(25),
+  }),
   email: z.string().email().max(100),
   password: z.string().min(6).max(50),
 });

@@ -80,3 +80,9 @@ export enum UserRole {
   ADMIN = 'Admin',
   MODERATOR = 'Moderator',
 }
+
+export interface UpdateUserProfilePayload {
+  fullName: string;
+  profilePicture: string;
+  contactEmail: string;
+}

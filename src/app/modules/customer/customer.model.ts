@@ -4,6 +4,26 @@ import { AccountStatus } from '../User/user.interface';
 
 const CustomerModelSchema = new Schema<Customer>(
   {
+    name: {
+      type: {
+        first: {
+          type: String,
+          required: true,
+          minLength: 1,
+          maxLength: 25,
+          trim: true,
+        },
+        last: {
+          type: String,
+          required: true,
+          minLength: 1,
+          maxLength: 25,
+          trim: true,
+        },
+      },
+      required: true,
+    },
+
     fullName: {
       type: String,
       required: true,
@@ -13,9 +33,9 @@ const CustomerModelSchema = new Schema<Customer>(
     },
     profilePicture: {
       type: String,
-      required: true,
       minLength: 1,
       trim: true,
+      default: null,
     },
     wallet: {
       type: Types.ObjectId,
@@ -27,6 +47,11 @@ const CustomerModelSchema = new Schema<Customer>(
       min: 0,
       default: 0,
     },
+    phone: {
+      type: String,
+      minlength: 1,
+      default: null,
+    },
     email: {
       type: String,
       required: true,
@@ -37,7 +62,7 @@ const CustomerModelSchema = new Schema<Customer>(
     password: {
       type: String,
       minLength: 1,
-      select:false,
+      select: false,
       trim: true,
       default: null,
     },
@@ -67,5 +92,5 @@ const CustomerModelSchema = new Schema<Customer>(
   }
 );
 
-const CustomerModel = model<Customer>("Customer", CustomerModelSchema);
+const CustomerModel = model<Customer>('Customer', CustomerModelSchema);
 export default CustomerModel;

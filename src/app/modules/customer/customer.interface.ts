@@ -1,12 +1,15 @@
 import { ObjectId } from 'mongoose';
 import { AccountStatus, Provider } from '../User/user.interface';
+import { Name } from '../../types/model.type';
 
 export interface Customer {
   _id: ObjectId;
+  name: Name;
   fullName: string;
   profilePicture: string;
   wallet: ObjectId;
   ordersCount: number;
+  phone?: string;
   email: string;
   password: string;
   googleId: string;
@@ -19,19 +22,17 @@ export interface Customer {
 }
 
 export interface CreateCustomerPayload
-  extends Pick<Customer, 'fullName' | 'email' | 'password' | 'googleId' | 'facebookId'> {}
+  extends Pick<Customer, 'name' | 'email' | 'password' | 'googleId' | 'facebookId'> {}
 
+export interface CustomersFilterPayload
+  extends Partial<{
+    searchTerm: string;
+    email: string;
+    fullName: string;
+    status: AccountStatus;
+  }> {}
 
-  export interface ICustomersFilterPayload extends Partial<{
-    searchTerm:string
-    email:string
-    fullName:string
-    status:AccountStatus
-  }>{
-    
-  }
-
-  export interface IChangeCustomerStatusPayload {
-    id:string,
-    status:AccountStatus
-  }
+export interface ChangeCustomerStatusPayload {
+  id: string;
+  status: AccountStatus;
+}

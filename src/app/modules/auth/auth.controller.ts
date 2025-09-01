@@ -6,7 +6,7 @@ import catchAsync from '../../utils/catchAsync';
 
 class AuthController {
   customerSignUp = catchAsync(async (req, res) => {
-    const result = authService.customerSignIn(req.body);
+    const result = authService.customerSignup(req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -14,7 +14,7 @@ class AuthController {
     });
   });
   customerSignin = catchAsync(async (req, res) => {
-    const result = authService.customerSignIn(req.body);
+    const result = authService.customerSignin(req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
