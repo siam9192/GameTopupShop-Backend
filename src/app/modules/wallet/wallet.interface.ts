@@ -1,8 +1,8 @@
-import { ObjectId } from 'mongoose';
+import { Types } from 'mongoose';
 
 export interface IWalletHistory {
-  _id: ObjectId;
-  walletId: ObjectId;
+  _id: Types.ObjectId;
+  walletId: Types.ObjectId;
   title: string;
   amount: string;
   createdAt: string;
@@ -10,9 +10,9 @@ export interface IWalletHistory {
 }
 
 export interface Wallet {
-  _id: ObjectId;
-  customerId: ObjectId;
-  balance: ObjectId;
+  _id: Types.ObjectId;
+  customerId: Types.ObjectId;
+  balance: Types.ObjectId;
   createdAt: string;
   updatedAt: string;
 }

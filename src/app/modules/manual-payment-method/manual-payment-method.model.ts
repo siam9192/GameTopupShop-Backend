@@ -32,7 +32,7 @@ const ManualPaymentMethodModelSchema = new Schema<ManualPaymentMethod>(
 );
 
 const ManualPaymentMethodModel = model<ManualPaymentMethod>(
-  'Manual-payment-method',
+  'ManualPaymentMethod',
   ManualPaymentMethodModelSchema
 );
 

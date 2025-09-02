@@ -1,4 +1,4 @@
-import { UserRole } from '../modules/user/';
+import { UserRole } from '../modules/user/user.interface';
 
 export const PAGINATION_OPTION_KEYS = ['page', 'limit', 'sortBy', 'sortOrder'];
 
