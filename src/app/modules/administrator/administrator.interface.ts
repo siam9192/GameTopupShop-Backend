@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongoose';
-import { AccountStatus, AdministratorLevel, Provider } from '../User/user.interface';
+import { AccountStatus, AdministratorLevel, Provider } from '../user/user.interface';
 import { ChangeCustomerStatusPayload } from '../customer/customer.interface';
 import { Name } from '../../types/model.type';
 

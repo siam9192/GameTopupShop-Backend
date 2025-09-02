@@ -17,14 +17,14 @@ export interface Wallet {
   updatedAt: string;
 }
 
-export interface WalletsFilterPayload extends Partial <{
-  searchTerm: string;
-  name: string;
-  email: string;
-  minBalance: string;
-  maxBalance: string;
-}
-> {}
+export interface WalletsFilterPayload
+  extends Partial<{
+    searchTerm: string;
+    name: string;
+    email: string;
+    minBalance: string;
+    maxBalance: string;
+  }> {}
 export interface UpdateWalletBalancePayload {
   id: string;
   balance: number;

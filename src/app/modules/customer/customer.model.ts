@@ -1,6 +1,6 @@
 import { model, now, Schema, Types } from 'mongoose';
 import { Customer } from './customer.interface';
-import { AccountStatus } from '../User/user.interface';
+import { AccountStatus } from '../user/user.interface';
 
 const CustomerModelSchema = new Schema<Customer>(
   {

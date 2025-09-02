@@ -12,7 +12,8 @@ import WalletModel from '../wallet/wallet.model';
 import { IPaginationOptions } from '../../types';
 import { calculatePagination } from '../../helpers/paginationHelper';
 import { objectId } from '../../helpers';
-import { AccountStatus } from '../User/user.interface';
+import { AccountStatus } from '../user/user.interface';
+
 class CustomerService {
   async createCustomer(payload: CreateCustomerPayload) {
     const { name, email, password, googleId, facebookId } = payload;

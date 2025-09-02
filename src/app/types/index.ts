@@ -1,5 +1,5 @@
 import e from 'express';
-import { TUserRole } from '../modules/User/user.interface';
+import { TUserRole } from '../modules/user/';
 
 export interface IFbDataResponse {
   id: string;

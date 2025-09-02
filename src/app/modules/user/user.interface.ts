@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongoose';
+import { Name } from '../../types/model.type';
 
 interface User {
   _id: ObjectId;
@@ -82,7 +83,18 @@ export enum UserRole {
 }
 
 export interface UpdateUserProfilePayload {
-  fullName: string;
+  name: Name;
   profilePicture: string;
-  contactEmail: string;
+  phone: string;
+}
+
+export interface UpdateCustomerProfilePayload {
+  name: Name;
+  profilePicture: string;
+  phone: string;
+}
+
+export interface UpdateAdministratorProfilePayload {
+  name: Name;
+  profilePicture: string;
 }

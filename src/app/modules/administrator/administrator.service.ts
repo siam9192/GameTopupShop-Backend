@@ -4,7 +4,7 @@ import bycryptHelpers from '../../helpers/bycryptHelpers';
 import httpStatus from '../../shared/http-status';
 import { IPaginationOptions } from '../../types';
 import CustomerModel from '../customer/customer.model';
-import { AccountStatus, AdministratorLevel } from '../User/user.interface';
+import { AccountStatus, AdministratorLevel } from '../user/user.interface';
 import {
   AdministratorsFilterPayload,
   ChangeAdministratorLevelPayload,

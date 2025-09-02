@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AccountStatus } from '../User/user.interface';
+import { AccountStatus } from '../user/user.interface';
 
 const changeCustomerStatusValidation = z.object({
   id: z.string().nonempty(),

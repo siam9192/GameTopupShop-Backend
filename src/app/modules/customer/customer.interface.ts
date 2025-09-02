@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongoose';
-import { AccountStatus, Provider } from '../User/user.interface';
+import { AccountStatus, Provider } from '../user/user.interface';
 import { Name } from '../../types/model.type';
 
 export interface Customer {

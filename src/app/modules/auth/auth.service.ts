@@ -8,7 +8,7 @@ import AdministratorModel from '../administrator/administrator.model';
 import { CreateCustomerPayload } from '../customer/customer.interface';
 import CustomerModel from '../customer/customer.model';
 import customerService from '../customer/customer.service';
-import { AccountStatus, UserRole } from '../User/user.interface';
+import { AccountStatus, UserRole } from '../user/';
 import { AuthUser, ChangePasswordPayload, SigninPayload } from './auth.interface';
 
 class AuthService {

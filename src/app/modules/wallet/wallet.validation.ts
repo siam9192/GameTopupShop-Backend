@@ -1,13 +1,12 @@
-import { z } from "zod"
+import { z } from 'zod';
 
-const updateWalletBalanceValidation =  z.object({
-    id:z.string().nonempty(),
-    balance:z.number().min(0)
-})
+const updateWalletBalanceValidation = z.object({
+  id: z.string().nonempty(),
+  balance: z.number().min(0),
+});
 
-const walletValidations =  {
- updateWalletBalanceValidation
-}
+const walletValidations = {
+  updateWalletBalanceValidation,
+};
 
-
-export default walletValidations
+export default walletValidations;

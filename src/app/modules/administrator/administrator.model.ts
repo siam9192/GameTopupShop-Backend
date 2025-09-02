@@ -1,5 +1,5 @@
 import { model, now, Schema, Types } from 'mongoose';
-import { AccountStatus, AdministratorLevel } from '../User/user.interface';
+import { AccountStatus, AdministratorLevel } from '../user/user.interface';
 import { Administrator } from './administrator.interface';
 
 const AdministratorModelSchema = new Schema<Administrator>(

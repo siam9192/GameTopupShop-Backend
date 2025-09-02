@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AdministratorLevel } from '../User/user.interface';
+import { AdministratorLevel } from '../user/user.interface';
 
 const createAdministratorValidation = z.object({
   name: z.object({

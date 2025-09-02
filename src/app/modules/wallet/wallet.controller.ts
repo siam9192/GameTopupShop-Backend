@@ -1,14 +1,14 @@
-import { paginationOptionPicker } from "../../helpers/paginationHelper";
-import httpStatus from "../../shared/http-status";
-import catchAsync from "../../utils/catchAsync";
-import Pick from "../../utils/pick";
-import { sendSuccessResponse } from "../../utils/response";
-import walletService from "./wallet.service";
+import { paginationOptionPicker } from '../../helpers/paginationHelper';
+import httpStatus from '../../shared/http-status';
+import catchAsync from '../../utils/catchAsync';
+import Pick from '../../utils/pick';
+import { sendSuccessResponse } from '../../utils/response';
+import walletService from './wallet.service';
 
 class WalletController {
-     getWallets = catchAsync(async (req, res) => {
+  getWallets = catchAsync(async (req, res) => {
     const result = walletService.getWalletsFromDB(
-      Pick(req.query, ['searchTerm',"minBalance","maxBalance"]),
+      Pick(req.query, ['searchTerm', 'minBalance', 'maxBalance']),
       paginationOptionPicker(req.query)
     );
     sendSuccessResponse(res, {
@@ -17,30 +17,32 @@ class WalletController {
       message: 'Wallets retrieved Successfully',
     });
   });
-    getWalletByCustomerId = catchAsync(async (req, res) => {
-    const result = walletService.getWalletByCustomerIdFromDB(
-      req.params.customerId
-    );
+  getWalletByCustomerId = catchAsync(async (req, res) => {
+    const result = walletService.getWalletByCustomerIdFromDB(req.params.customerId);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
       message: 'Wallet retrieved Successfully',
     });
   });
-    getWalletById = catchAsync(async (req, res) => {
-    const result = walletService.getWalletByIdFromDB(
-      req.params.id
-    );
+  getMyWallet = catchAsync(async (req, res) => {
+    const result = walletService.getWalletByCustomerIdFromDB(req.user.userId);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
       message: 'Wallet retrieved Successfully',
     });
   });
-    updateWalletBalance = catchAsync(async (req, res) => {
-    const result = walletService.updateWalletBalanceIntoDB(
-      req.body
-    );
+  getWalletById = catchAsync(async (req, res) => {
+    const result = walletService.getWalletByIdFromDB(req.params.id);
+    sendSuccessResponse(res, {
+      statusCode: httpStatus.OK,
+      data: result,
+      message: 'Wallet retrieved Successfully',
+    });
+  });
+  updateWalletBalance = catchAsync(async (req, res) => {
+    const result = walletService.updateWalletBalanceIntoDB(req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -49,5 +51,4 @@ class WalletController {
   });
 }
 
-
-export default new WalletController()
+export default new WalletController();

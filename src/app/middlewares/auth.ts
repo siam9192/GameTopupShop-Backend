@@ -4,7 +4,7 @@ import catchAsync from '../utils/catchAsync';
 import AppError from '../Errors/AppError';
 
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { EUserStatus, TUserRole } from '../modules/User/user.interface';
+import { EUserStatus, TUserRole } from '../modules/user/';
 import httpStatus from '../shared/http-status';
 import envConfig from '../config/env.config';
 import User from '../modules/User/user.model';
