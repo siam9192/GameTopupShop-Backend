@@ -8,9 +8,10 @@ export interface Notification {
   message: string;
   link?: string;
   visitId?: string;
-  isRead: boolean; // changed to boolean
   category: NotificationCategory;
   type: NotificationType;
+  isRead: boolean; // changed to boolean
+
   createdAt: Date; // optional timestamp
   updatedAt: Date; // optional timestamp
 }
@@ -26,5 +27,6 @@ export enum NotificationCategory {
   ADMIN = 'Admin', // Admin-related alerts
   PAYMENT = 'Payment', // Payment success/failure
   ORDER = 'Order', // Order status updates
+  WALLET_SUBMISSION = 'Wallet_Submission',
   PROMOTION = 'Promotion', // Discounts, offers, campaigns
 }

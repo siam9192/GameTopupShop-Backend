@@ -14,6 +14,8 @@ import WalletModel from '../wallet/wallet.model';
 import { calculatePagination } from '../../helpers/paginationHelper';
 import { objectId } from '../../helpers';
 import { UserRole } from '../user/user.interface';
+import NotificationModel from '../notification/notification.model';
+import { NotificationCategory, NotificationType } from '../notification/notification.interface';
 
 class WalletSubmissionService {
   async createWalletSubmissionIntoDB(authUser: IAuthUser, payload: CreateWalletSubmissionPayload) {
@@ -21,10 +23,28 @@ class WalletSubmissionService {
 
     if (!existingMethod) throw new AppError(httpStatus.NOT_FOUND, 'Method not found');
 
-    return await WalletSubmissionModel.create({
+    const result = await WalletSubmissionModel.create({
       ...payload,
       methodName: existingMethod.name,
     });
+
+    NotificationModel.create({
+      customerId: authUser.userId,
+      title: 'Thanks for wallet submission',
+      message: 'Your wallet submission has been received and is under review.',
+      type: NotificationType.SUCCESS,
+      category: NotificationCategory.WALLET_SUBMISSION,
+    });
+
+    NotificationModel.create({
+      customerId: authUser.userId,
+      title: 'New Wallet Submission',
+      message: `A new wallet submission of ${payload.amount} has been received and is awaiting your review.`,
+      type: NotificationType.SUCCESS,
+      category: NotificationCategory.WALLET_SUBMISSION,
+    });
+
+    return result;
   }
 
   async approveWalletSubmissionIntoDB(id: string) {
@@ -60,6 +80,15 @@ class WalletSubmissionService {
       }
       await session.commitTransaction();
 
+      NotificationModel.create({
+        customerId: existingSubmission.customerId,
+        title: 'Wallet Submission Approved',
+        message: `Your submission of ${existingSubmission.amount} has been approved and credited to your wallet balance.`,
+        visitId: id,
+        type: NotificationType.SUCCESS,
+        category: NotificationCategory.WALLET_SUBMISSION,
+      });
+
       return await WalletSubmissionModel.findById(existingSubmission._id);
     } catch (error: any) {
       await session.abortTransaction();
@@ -73,11 +102,22 @@ class WalletSubmissionService {
     const existingSubmission = await WalletSubmissionModel.findById(id);
     if (!existingSubmission) throw new AppError(httpStatus.NOT_FOUND, 'Submission not found');
 
-    return await WalletSubmissionModel.findByIdAndUpdate(
+    const result = await WalletSubmissionModel.findByIdAndUpdate(
       existingSubmission._id,
       { status: WalletSubmissionStatus.DECLINED },
       { new: true }
     );
+
+    NotificationModel.create({
+      customerId: existingSubmission.customerId,
+      title: 'Wallet Submission Declined',
+      message: `Your submission of ${existingSubmission.amount} has been declined. Please check your submission details.`,
+
+      visitId: id,
+      type: NotificationType.SUCCESS,
+      category: NotificationCategory.WALLET_SUBMISSION,
+    });
+    return result;
   }
 
   async getMySubmissionsFromDB(

@@ -11,7 +11,9 @@ const NotificationModelSchema = new Schema<Notification>(
     },
     title: { type: String, required: true },
     message: { type: String, required: true },
-    isRead: { type: Boolean, default: false },
+    link: { type: String, default: null },
+    visitId: { type: String, default: null },
+
     category: {
       type: String,
       enum: Object.values(NotificationCategory),
@@ -22,6 +24,7 @@ const NotificationModelSchema = new Schema<Notification>(
       enum: Object.values(NotificationType),
       required: true,
     },
+    isRead: { type: Boolean, default: false },
   },
   {
     timestamps: true, // auto adds createdAt & updatedA

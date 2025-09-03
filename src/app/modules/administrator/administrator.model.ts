@@ -38,7 +38,7 @@ const AdministratorModelSchema = new Schema<Administrator>(
     },
     level: {
       type: String,
-      enum: AdministratorLevel,
+      enum: Object.values(AdministratorLevel),
       required: true,
     },
     email: {
@@ -60,7 +60,7 @@ const AdministratorModelSchema = new Schema<Administrator>(
       default: now(),
     },
     status: {
-      enum: AccountStatus,
+      enum: Object.values(AccountStatus),
       default: AccountStatus.ACTIVE,
     },
   },

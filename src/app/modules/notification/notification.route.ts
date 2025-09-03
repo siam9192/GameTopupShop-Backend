@@ -7,11 +7,11 @@ import notificationsValidations from './notification.validation';
 
 const router = Router();
 
-router.get('/my', auth(ALL_ROLES), notificationController.getMyNotifications);
+router.get('/my', auth(...ALL_ROLES), notificationController.getMyNotifications);
 
 router.patch(
   '/set-read',
-  auth(ALL_ROLES),
+  auth(...ALL_ROLES),
   validateRequest(notificationsValidations.notificationsSetAsReadValidation),
   notificationController.notificationsSetAsRead
 );

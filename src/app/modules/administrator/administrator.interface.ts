@@ -23,12 +23,12 @@ export interface CreateAdministratorPayload
     'name' | 'profilePicture' | 'level' | 'email' | 'password' | 'status'
   > {}
 
-export interface AdministratorsFilterPayload
-  extends Partial<Pick<Administrator, 'fullName' | 'email' | 'level'>> {
-  searchTerm: string;
-}
-
-export interface ChangeAdministratorLevelPayload {
+export type AdministratorsFilterPayload = Partial<
+  Pick<Administrator, 'fullName' | 'email' | 'level' | 'status'> & {
+    searchTerm: string;
+  }
+>;
+export interface UpdateAdministratorLevelPayload {
   id: string;
   level: AdministratorLevel;
 }

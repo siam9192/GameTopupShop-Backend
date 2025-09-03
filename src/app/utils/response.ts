@@ -17,7 +17,7 @@ export type TMeta = {
   page: number;
   limit: number;
   pages?: number[];
-  totalResult: number;
+  totalResults: number;
   total?: number;
 };
 

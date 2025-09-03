@@ -12,7 +12,7 @@ export interface IWalletHistory {
 export interface Wallet {
   _id: Types.ObjectId;
   customerId: Types.ObjectId;
-  balance: Types.ObjectId;
+  balance: number;
   createdAt: string;
   updatedAt: string;
 }

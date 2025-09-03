@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AdministratorLevel } from '../user/user.interface';
+import { AccountStatus, AdministratorLevel } from '../user/user.interface';
 
 const createAdministratorValidation = z.object({
   name: z.object({
@@ -13,8 +13,20 @@ const createAdministratorValidation = z.object({
   password: z.string().min(6),
 });
 
+const updateAdministratorStatusIntoDB = z.object({
+  id: z.string().nonempty(),
+  status: z.nativeEnum(AccountStatus),
+});
+
+const updateAdministratorLevelIntoDB = z.object({
+  id: z.string().nonempty(),
+  status: z.nativeEnum(AdministratorLevel),
+});
+
 const administratorValidations = {
   createAdministratorValidation,
+  updateAdministratorStatusIntoDB,
+  updateAdministratorLevelIntoDB,
 };
 
 export default administratorValidations;

@@ -43,7 +43,7 @@ const WalletSubmissionModelSchema = new Schema<WalletSubmission>(
     },
     status: {
       type: String,
-      enum: WalletSubmissionStatus,
+      enum: Object.values(WalletSubmissionStatus),
       default: WalletSubmissionStatus.PENDING,
     },
   },

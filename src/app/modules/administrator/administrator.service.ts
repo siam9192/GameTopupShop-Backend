@@ -7,9 +7,9 @@ import CustomerModel from '../customer/customer.model';
 import { AccountStatus, AdministratorLevel } from '../user/user.interface';
 import {
   AdministratorsFilterPayload,
-  ChangeAdministratorLevelPayload,
   ChangeAdministratorStatusPayload,
   CreateAdministratorPayload,
+  UpdateAdministratorLevelPayload,
 } from './administrator.interface';
 import AdministratorModel from './administrator.model';
 import { calculatePagination } from '../../helpers/paginationHelper';
@@ -127,7 +127,7 @@ class AdministratorService {
     return customer;
   }
 
-  async changeAdministratorLevel(payload: ChangeAdministratorLevelPayload) {
+  async updateAdministratorLevelIntoDB(payload: UpdateAdministratorLevelPayload) {
     const { id, level } = payload;
 
     // validate id
@@ -159,7 +159,7 @@ class AdministratorService {
     );
   }
 
-  async changeAdministratorStatusIntoDB(payload: ChangeAdministratorStatusPayload) {
+  async updateAdministratorStatusIntoDB(payload: ChangeAdministratorStatusPayload) {
     const { id, status } = payload;
 
     // validate id
@@ -187,3 +187,5 @@ class AdministratorService {
     );
   }
 }
+
+export default new AdministratorService();
