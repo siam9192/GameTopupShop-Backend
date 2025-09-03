@@ -5,7 +5,7 @@ export interface WalletSubmission {
   methodId: Types.ObjectId;
   methodName: string;
   number: string;
-  transactionId:string
+  transactionId: string;
   amount: number;
   note: string;
   declineReason?: string;

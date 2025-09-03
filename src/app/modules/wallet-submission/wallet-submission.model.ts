@@ -21,7 +21,7 @@ const WalletSubmissionModelSchema = new Schema<WalletSubmission>(
       type: String,
       required: true,
     },
-     transactionId: {
+    transactionId: {
       type: String,
       required: true,
     },

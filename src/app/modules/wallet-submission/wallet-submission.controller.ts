@@ -14,7 +14,7 @@ class WalletSubmissionController {
       message: 'Wallet submission created successfully',
     });
   });
-   approveWalletSubmission = catchAsync(async (req, res) => {
+  approveWalletSubmission = catchAsync(async (req, res) => {
     const result = walletSubmissionService.approveWalletSubmissionIntoDB(req.params.id);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
@@ -22,32 +22,46 @@ class WalletSubmissionController {
       message: 'Wallet submission approved successfully',
     });
   });
-   declineWalletSubmission = catchAsync(async (req, res) => {
-    const result = walletSubmissionService.declineWalletSubmissionIntoDB(req.params.id,req.body);
+  declineWalletSubmission = catchAsync(async (req, res) => {
+    const result = walletSubmissionService.declineWalletSubmissionIntoDB(req.params.id, req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
       message: 'Wallet submission declined successfully',
     });
   });
-   getWalletSubmissions = catchAsync(async (req, res) => {
-    const result = walletSubmissionService.getSubmissionsFromDB(Pick(req.query,["searchTerm","customerId","methodName","minAmount","maxAmount","status"]),paginationOptionPicker(req.query));
+  getWalletSubmissions = catchAsync(async (req, res) => {
+    const result = walletSubmissionService.getSubmissionsFromDB(
+      Pick(req.query, [
+        'searchTerm',
+        'customerId',
+        'methodName',
+        'minAmount',
+        'maxAmount',
+        'status',
+      ]),
+      paginationOptionPicker(req.query)
+    );
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
       message: 'Wallet submissions retrieved successfully',
     });
   });
-    getMyWalletSubmissions = catchAsync(async (req, res) => {
-    const result = walletSubmissionService.getMySubmissionsFromDB(req.user,Pick(req.query,["searchTerm","methodName","minAmount","maxAmount","status"]),paginationOptionPicker(req.query));
+  getMyWalletSubmissions = catchAsync(async (req, res) => {
+    const result = walletSubmissionService.getMySubmissionsFromDB(
+      req.user,
+      Pick(req.query, ['searchTerm', 'methodName', 'minAmount', 'maxAmount', 'status']),
+      paginationOptionPicker(req.query)
+    );
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
       message: 'Wallet submissions retrieved successfully',
     });
   });
-getWalletSubmissionById = catchAsync(async (req, res) => {
- const result = walletSubmissionService.getSubmissionByIdFromDB(req.user,req.params.id);
+  getWalletSubmissionById = catchAsync(async (req, res) => {
+    const result = walletSubmissionService.getSubmissionByIdFromDB(req.user, req.params.id);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -56,5 +70,4 @@ getWalletSubmissionById = catchAsync(async (req, res) => {
   });
 }
 
-
-export default new WalletSubmissionController()
+export default new WalletSubmissionController();
