@@ -1,5 +1,5 @@
-import { model, Schema } from "mongoose";
-import { Offer, OfferInfoField, OfferInfoFieldType, OfferStatus } from "./offer.interface";
+import { model, Schema } from 'mongoose';
+import { Offer, OfferInfoField, OfferInfoFieldType, OfferStatus } from './offer.interface';
 
 const InfoFieldSchema = new Schema<OfferInfoField>(
   {
@@ -15,28 +15,31 @@ const InfoFieldSchema = new Schema<OfferInfoField>(
   { _id: false }
 );
 
-
-
 const OfferModelSchema: Schema<Offer> = new Schema({
   name: { type: String, required: true },
   platformName: { type: String, required: true },
-  startDate:{
-    type:Date,
-    required:true
+  startDate: {
+    type: Date,
+    required: true,
   },
-   endDate:{
-    type:Date,
-    required:true
+  endDate: {
+    type: Date,
+    required: true,
   },
-  price:{
-    type:Number,
-    min:0,
-    required:true
+  price: {
+    type: Number,
+    min: 0,
+    required: true,
   },
   coverPhoto: { type: String, required: true },
   description: { type: String, required: true },
   infoFields: { type: [InfoFieldSchema], required: true },
-  status: { type: String, enum: Object.values(OfferStatus),default:OfferStatus.PENDING, required: true },
+  status: {
+    type: String,
+    enum: Object.values(OfferStatus),
+    default: OfferStatus.PENDING,
+    required: true,
+  },
 });
 
 const OfferModel = model<Offer>('', OfferModelSchema);

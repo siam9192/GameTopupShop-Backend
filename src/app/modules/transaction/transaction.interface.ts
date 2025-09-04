@@ -48,9 +48,26 @@ export interface TransactionsFilterPayload
     customerId: string;
     method: PaymentMethod;
     status: TransactionStatus;
+    minAmount:string
+    maxAmount:string
   }> {}
 
 export interface UpdateTransactionStatusPayload {
   id: string;
   status: TransactionStatus;
+}
+
+export interface MakeOrderLivePaymentPayload {
+  orderId: string;
+  method: LivePaymentMethod;
+}
+
+
+export interface MakeWalletPaymentPayload {
+  orderId: string;
+}
+
+export enum LivePaymentMethod {
+  SSLCOMMERZ = 'Sslcommerz',
+  STRIPE = 'Stripe',
 }

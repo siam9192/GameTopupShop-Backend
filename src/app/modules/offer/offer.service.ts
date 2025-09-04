@@ -1,62 +1,67 @@
-import { Types } from "mongoose";
-import AppError from "../../Errors/AppError";
-import httpStatus from "../../shared/http-status";
-import { IAuthUser, IPaginationOptions } from "../../types";
-import { CreateOfferPayload, OffersFilterPayload, OfferStatus, UpdateOfferPayload, UpdateOfferStatusPayload } from "./offer.interface";
-import OfferModel from "./offer.model";
-import { calculatePagination } from "../../helpers/paginationHelper";
-import { objectId } from "../../helpers";
-import { UserRole } from "../user/user.interface";
-import { x } from "pdfkit";
+import { Types } from 'mongoose';
+import AppError from '../../Errors/AppError';
+import httpStatus from '../../shared/http-status';
+import { IAuthUser, IPaginationOptions } from '../../types';
+import {
+  CreateOfferPayload,
+  OffersFilterPayload,
+  OfferStatus,
+  UpdateOfferPayload,
+  UpdateOfferStatusPayload,
+} from './offer.interface';
+import OfferModel from './offer.model';
+import { calculatePagination } from '../../helpers/paginationHelper';
+import { objectId } from '../../helpers';
+import { UserRole } from '../user/user.interface';
+import { x } from 'pdfkit';
 
 class OfferService {
-    async createOfferIntoDB (payload:CreateOfferPayload) {
-       const {startDate,endDate} =  payload
-       if( new Date().getTime() >  new Date(startDate).getTime()) {
-        throw new AppError(httpStatus.FORBIDDEN,"Invalid start date ")
-       }
-       else if( new Date(endDate).getTime() <  new Date(startDate).getTime()) {
-        throw new AppError(httpStatus.FORBIDDEN,"Start date can not be getter than end date ")
-       }
-
-       return await OfferModel.create({
-        ...payload,
-        startDate:new Date(startDate),
-        endDate:new Date(endDate),
-        status:new Date(startDate).getTime() <= new Date().getTime() ? OfferStatus.Running : OfferStatus.PENDING
-       })
+  async createOfferIntoDB(payload: CreateOfferPayload) {
+    const { startDate, endDate } = payload;
+    if (new Date().getTime() > new Date(startDate).getTime()) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Invalid start date ');
+    } else if (new Date(endDate).getTime() < new Date(startDate).getTime()) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Start date can not be getter than end date ');
     }
-   async updateOfferIntoDB(id: string, payload: UpdateOfferPayload) {
-  // Validate existence
-  const existingOffer = await OfferModel.findById(id);
-  if (!existingOffer) {
-    throw new AppError(httpStatus.NOT_FOUND, "Offer not found");
+
+    return await OfferModel.create({
+      ...payload,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      status:
+        new Date(startDate).getTime() <= new Date().getTime()
+          ? OfferStatus.Running
+          : OfferStatus.PENDING,
+    });
   }
+  async updateOfferIntoDB(id: string, payload: UpdateOfferPayload) {
+    // Validate existence
+    const existingOffer = await OfferModel.findById(id);
+    if (!existingOffer) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Offer not found');
+    }
 
-  const { startDate, endDate } = payload;
+    const { startDate, endDate } = payload;
 
-  // Validate start date (cannot update to a past date, except same day)
-  if (
-    startDate &&
-    new Date(startDate).getTime() !== existingOffer.startDate.getTime() &&
-    new Date(startDate) < new Date()
-  ) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "Cannot update offer start date to a past time"
-    );
+    // Validate start date (cannot update to a past date, except same day)
+    if (
+      startDate &&
+      new Date(startDate).getTime() !== existingOffer.startDate.getTime() &&
+      new Date(startDate) < new Date()
+    ) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Cannot update offer start date to a past time');
+    }
+
+    // Prepare update fields
+    const updateData = {
+      ...payload,
+      startDate: startDate ? new Date(startDate) : existingOffer.startDate,
+      endDate: endDate ? new Date(endDate) : existingOffer.endDate,
+    };
+
+    // Update and return the latest document
+    return await OfferModel.findByIdAndUpdate(id, updateData, { new: true });
   }
-
-  // Prepare update fields
-  const updateData = {
-    ...payload,
-    startDate: startDate ? new Date(startDate) : existingOffer.startDate,
-    endDate: endDate ? new Date(endDate) : existingOffer.endDate,
-  };
-
-  // Update and return the latest document
-  return await OfferModel.findByIdAndUpdate(id, updateData, { new: true });
-   }
 
   async updateOfferStatusIntoDB(payload: UpdateOfferStatusPayload) {
     const { id, status } = payload;
@@ -71,8 +76,8 @@ class OfferService {
     );
   }
 
-   async softDeleteOfferFromDB(id: string) {
-     const existingOffer = await OfferModel.findOne({
+  async softDeleteOfferFromDB(id: string) {
+    const existingOffer = await OfferModel.findOne({
       _id: objectId(id),
       status: { $not: OfferStatus.DELETED },
     });
@@ -81,7 +86,7 @@ class OfferService {
     return null;
   }
 
- async getOffersFromDB(filterPayload: OffersFilterPayload, paginationOptions: IPaginationOptions) {
+  async getOffersFromDB(filterPayload: OffersFilterPayload, paginationOptions: IPaginationOptions) {
     const { searchTerm, ...otherFilterPayload } = filterPayload;
     let whereConditions: any = {};
     if (searchTerm) {
@@ -175,8 +180,8 @@ class OfferService {
         total,
       },
     };
-  } 
-  
+  }
+
   async getOfferByIdFromDB(authUser: IAuthUser | undefined, id: string) {
     const existingOffer = await OfferModel.findOne({
       _id: objectId(id),
@@ -192,7 +197,7 @@ class OfferService {
 
     return existingOffer;
   }
-async getEndingSoonOffersFromDB(paginationOptions: IPaginationOptions) {
+  async getEndingSoonOffersFromDB(paginationOptions: IPaginationOptions) {
     const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
     const offers = await OfferModel.find()
       .sort({ [sortBy]: sortOrder })
@@ -201,7 +206,7 @@ async getEndingSoonOffersFromDB(paginationOptions: IPaginationOptions) {
     const totalResults = await OfferModel.countDocuments();
     const total = await OfferModel.countDocuments();
     return {
-      data:offers ,
+      data: offers,
       meta: {
         page,
         limit,
@@ -210,8 +215,6 @@ async getEndingSoonOffersFromDB(paginationOptions: IPaginationOptions) {
       },
     };
   }
- 
-
 }
 
-export default new OfferService()
+export default new OfferService();

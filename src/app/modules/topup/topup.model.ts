@@ -22,14 +22,11 @@ const InfoFieldSchema = new Schema<TopupInfoField>(
   { _id: false }
 );
 
-const TopupPackageSchema = new Schema<TopupPackage>(
-  {
-    name: { type: String, required: true },
-    price: { type: Number, required: true },
-    status: { type: String, enum: Object.values(TopupPackageStatus), required: true },
-  },
-  { _id: false }
-);
+const TopupPackageSchema = new Schema<TopupPackage>({
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  status: { type: String, enum: Object.values(TopupPackageStatus), required: true },
+});
 
 const TopupModelSchema: Schema<Topup> = new Schema({
   name: { type: String, required: true },
@@ -39,7 +36,12 @@ const TopupModelSchema: Schema<Topup> = new Schema({
   coverPhoto: { type: String, required: true },
   description: { type: String, required: true },
   infoFields: { type: [InfoFieldSchema], required: true },
-  status: { type: String, enum: Object.values(TopupStatus), default:TopupStatus.ACTIVE, required: true },
+  status: {
+    type: String,
+    enum: Object.values(TopupStatus),
+    default: TopupStatus.ACTIVE,
+    required: true,
+  },
 });
 
 const TopupModel = model<Topup>('Topup', TopupModelSchema);

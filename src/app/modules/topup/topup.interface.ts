@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 export interface Topup extends Document {
   name: string;
   platformName: string;
@@ -12,6 +14,7 @@ export interface Topup extends Document {
 }
 
 export type TopupPackage = {
+  _id: Types.ObjectId;
   name: string;
   price: number;
   status: TopupPackageStatus;

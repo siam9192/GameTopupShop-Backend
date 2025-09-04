@@ -12,6 +12,10 @@ router.get('/', auth(...ALL_ADMINISTRATOR_LEVELS), transactionController.getTran
 router.get('/my', auth(UserRole.CUSTOMER), transactionController.getMyTransactions);
 router.get('/:id', auth(...ALL_ROLES), transactionController.getTransactionById);
 
+router.post("/live-payment",auth(UserRole.CUSTOMER),validateRequest(transactionValidations.makeOrderLivePaymentValidation),transactionController.makeOrderLivePayment)
+
+router.post("/wallet-payment",auth(UserRole.CUSTOMER),validateRequest(transactionValidations.makeOrderWalletPaymentValidation),transactionController.makeOrderWalletPayment)
+
 router.patch(
   '/status',
   auth(AdministratorLevel.SUPER_ADMIN),
@@ -19,5 +23,5 @@ router.patch(
   transactionController.updateTransactionStatus
 );
 
-const transactionsRouter = router;
-export default transactionsRouter;
+const transactionRouter = router;
+export default transactionRouter;

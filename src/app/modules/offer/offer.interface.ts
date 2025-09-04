@@ -3,7 +3,7 @@ export interface Offer {
   platformName: string;
   startDate: Date;
   endDate: Date;
-  price:number
+  price: number;
   coverPhoto: string;
   description: string;
   infoFields: OfferInfoField[];

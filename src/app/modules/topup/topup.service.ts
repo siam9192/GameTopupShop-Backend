@@ -51,7 +51,7 @@ class TopupService {
   }
 
   async topupSoftDeleteFormDB(id: string) {
-     const existingTopup = await TopupModel.findById(id);
+    const existingTopup = await TopupModel.findById(id);
     if (!existingTopup) throw new AppError(httpStatus.NOT_FOUND, 'Topup not found');
     await TopupModel.findByIdAndUpdate(id, { status: TopupStatus.DELETED }, { new: true });
     return null;
@@ -151,7 +151,7 @@ class TopupService {
         total,
       },
     };
-  } 
+  }
 
   async getTopupByIdFromDB(authUser: IAuthUser | undefined, id: string) {
     const existingTopup = await TopupModel.findOne({
@@ -168,8 +168,6 @@ class TopupService {
 
     return existingTopup;
   }
-
-  
 
   async getFeaturedTopupsFromDB(paginationOptions: IPaginationOptions) {
     const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);

@@ -18,9 +18,9 @@ const createOfferValidation = z.object({
       optional: z.boolean(),
     })
   ),
-  price:z.number().min(0),
-  startDate:z.string().datetime(),
-  endDate:z.string().datetime()
+  price: z.number().min(0),
+  startDate: z.string().datetime(),
+  endDate: z.string().datetime(),
 });
 
 const updateOfferValidation = createOfferValidation.partial();

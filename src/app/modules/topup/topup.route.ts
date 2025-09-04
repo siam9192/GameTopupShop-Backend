@@ -8,9 +8,24 @@ import offerValidations from '../offer/offer.validation';
 
 const router = Router();
 
-router.post('/', auth(...ALL_ADMINISTRATOR_LEVELS),validateRequest(topupValidations.createTopupValidation), topupController.createTopup);
-router.put('/:id', auth(...ALL_ADMINISTRATOR_LEVELS), validateRequest(offerValidations.updateOfferValidation),topupController.updateTopup);
-router.patch('/status', auth(...ALL_ADMINISTRATOR_LEVELS),validateRequest(offerValidations.updateOfferStatus), topupController.updateTopupStatus);
+router.post(
+  '/',
+  auth(...ALL_ADMINISTRATOR_LEVELS),
+  validateRequest(topupValidations.createTopupValidation),
+  topupController.createTopup
+);
+router.put(
+  '/:id',
+  auth(...ALL_ADMINISTRATOR_LEVELS),
+  validateRequest(offerValidations.updateOfferValidation),
+  topupController.updateTopup
+);
+router.patch(
+  '/status',
+  auth(...ALL_ADMINISTRATOR_LEVELS),
+  validateRequest(offerValidations.updateOfferStatus),
+  topupController.updateTopupStatus
+);
 router.delete('/:id', topupController.softDeleteTopup);
 
 router.get('/', topupController.getTopups);

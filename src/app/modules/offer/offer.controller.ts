@@ -5,7 +5,6 @@ import Pick from '../../utils/pick';
 import { sendSuccessResponse } from '../../utils/response';
 import offerService from './offer.service';
 
-
 class OfferController {
   createOffer = catchAsync(async (req, res) => {
     const result = await offerService.createOfferIntoDB(req.body);

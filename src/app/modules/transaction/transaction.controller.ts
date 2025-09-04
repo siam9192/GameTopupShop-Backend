@@ -48,6 +48,30 @@ class TransactionController {
       message: 'Transaction status updated successfully',
     });
   });
+   makeOrderWalletPayment = catchAsync(async (req, res) => {
+    const result = await transactionService.makeOrderWalletPayment(req.user,req.body);
+    sendSuccessResponse(res, {
+      statusCode: httpStatus.OK,
+      data: result,
+      message: 'Wallet payment successful',
+    });
+  });
+    makeOrderLivePayment = catchAsync(async (req, res) => {
+    const result = await transactionService.makeOrderLivePayment(req.user,req.body);
+    sendSuccessResponse(res, {
+      statusCode: httpStatus.OK,
+      data: result,
+      message: 'Live payment successful',
+    });
+  });
+  confirmOrderPayment = catchAsync(async (req, res) => {
+    const result = await transactionService.confirmOrderPayment(req.params.orderId);
+    sendSuccessResponse(res, {
+      statusCode: httpStatus.OK,
+      data: result,
+      message: 'Live payment successful',
+    });
+  });
 }
 
 export default new TransactionController();
