@@ -27,13 +27,15 @@ import { sslcommerzPayment } from '../../payment-method/sslCommez';
 import envConfig from '../../config/env.config';
 import { stripePayment } from '../../payment-method/stripePayment';
 import CustomerModel from '../customer/customer.model';
+import { WalletHistoryType } from '../wallet-history/wallet-history.interface';
+import WalletHistoryModel from '../wallet-history/wallet-history.model';
 
 class TransactionService {
   async getTransactionsFromDB(
     filterPayload: TransactionsFilterPayload,
     paginationOptions: IPaginationOptions
   ) {
-    const { id, customerId, orderId,minAmount,maxAmount, ...restPayload } = filterPayload;
+    const { id, customerId, orderId, minAmount, maxAmount, ...restPayload } = filterPayload;
     const whereConditions: Record<string, any> = {
       ...restPayload,
     };
@@ -48,8 +50,7 @@ class TransactionService {
       whereConditions.orderId = objectId(orderId);
     }
 
-  
-       if (
+    if (
       (minAmount !== undefined && !isNaN(Number(minAmount))) ||
       (maxAmount !== undefined && !isNaN(Number(maxAmount)))
     ) {
@@ -63,7 +64,6 @@ class TransactionService {
         whereConditions.amount.$lte = Number(maxAmount);
       }
     }
-   
 
     const { page, skip, limit, sortBy, sortOrder } = calculatePagination(paginationOptions);
 
@@ -178,8 +178,8 @@ class TransactionService {
     }
     return await TransactionModel.findByIdAndUpdate(payload.id, { status: payload.status });
   }
-  async makeOrderWalletPayment(authUser: IAuthUser, payload:MakeWalletPaymentPayload) {
-    const {orderId} =  payload
+  async makeOrderWalletPayment(authUser: IAuthUser, payload: MakeWalletPaymentPayload) {
+    const { orderId } = payload;
     const order = await OrderModel.findOne({
       _id: objectId(orderId),
       customerId: objectId(authUser.userId),
@@ -227,6 +227,22 @@ class TransactionService {
 
       if (!updateOrderStatus.modifiedCount) {
         throw new Error('Update order failed');
+      }
+
+      const createdWalletHistory = await WalletHistoryModel.create(
+        [
+          {
+            walletId: wallet._id,
+            prevBalance: wallet.balance,
+            amount: order.payment.amount,
+            type: WalletHistoryType.DEBIT,
+          },
+        ],
+        { session }
+      );
+
+      if (!createdWalletHistory) {
+        throw new Error('Create wallet history failed ');
       }
 
       NotificationModel.create({
@@ -282,32 +298,62 @@ class TransactionService {
       status: TransactionStatus.PENDING,
       reference: referenceId,
     });
-    
+
     return {
       paymentUrl,
     };
   }
-  async confirmOrderPayment (orderId:string) {
-   const order = await OrderModel.findOne({
-      _id: objectId(orderId),
+  async confirmOrderPayment(transactionId: string) {
+    const transaction = await TransactionModel.findOne({
+      _id: objectId(transactionId),
+      status: TransactionStatus.PENDING,
+    });
+
+    if (!transaction) throw new AppError(httpStatus.NOT_FOUND, 'Transaction not found');
+
+    const order = await OrderModel.findOne({
+      _id: transaction.orderId,
       status: OrderStatus.PENDING,
     });
-    if (!order) throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
-    await OrderModel.updateOne({
-      _id:objectId(orderId)
-    },{
-      status:OrderStatus.RUNNING,
-      "payment.status":PaymentStatus.PAID
-    }
-   
-  )
 
-  CustomerModel.updateOne({
-    _id:order.customerId,
-    $inc:{
-      ordersCount:1
-    }
-  })
+    if (!order) throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
+    await OrderModel.updateOne(
+      {
+        _id: transaction.orderId,
+      },
+      {
+        status: OrderStatus.RUNNING,
+        'payment.status': PaymentStatus.PAID,
+      }
+    );
+
+    await TransactionModel.updateOne(
+      {
+        _id: transaction._id,
+      },
+      { status: TransactionStatus.SUCCESS }
+    );
+    CustomerModel.updateOne({
+      _id: order.customerId,
+      $inc: {
+        ordersCount: 1,
+      },
+    });
+  }
+  async cancelOrderPayment(transactionIdId: string) {
+    const transaction = await TransactionModel.findOne({
+      _id: objectId(transactionIdId),
+      status: TransactionStatus.PENDING,
+    });
+
+    if (!transaction) throw new AppError(httpStatus.NOT_FOUND, 'Transaction not found');
+
+    await TransactionModel.updateOne(
+      {
+        _id: transaction._id,
+      },
+      { status: TransactionStatus.FAILED }
+    );
   }
 }
 

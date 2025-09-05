@@ -1,5 +1,6 @@
 import { JwtPayload } from 'jsonwebtoken';
-import { UserRole } from '../user/';
+import { UserRole } from '../user/user.interface';
+
 export interface AuthUser extends JwtPayload {
   role: UserRole;
   id: string;

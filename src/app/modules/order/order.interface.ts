@@ -55,18 +55,17 @@ export interface CreateOrderPayload {
   fieldsInfo: FieldInfo[];
 }
 
-export type OrdersFilterPayload =  Partial<{
-  id:string
-  searchTerm:string,
-  customerId:string,
-  minAmount:string
-  maxAmount:string,
-  status:OrderStatus,
-  category:ProductCategory
-}>
+export type OrdersFilterPayload = Partial<{
+  id: string;
+  searchTerm: string;
+  customerId: string;
+  minAmount: string;
+  maxAmount: string;
+  status: OrderStatus;
+  category: ProductCategory;
+}>;
 
-
-export type  UpdateOrderStatus  = {
-  id:string,
-  status:OrderStatus
-}
+export type UpdateOrderStatus = {
+  id: string;
+  status: OrderStatus;
+};

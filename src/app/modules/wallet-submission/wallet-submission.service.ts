@@ -16,6 +16,8 @@ import { objectId } from '../../helpers';
 import { UserRole } from '../user/user.interface';
 import NotificationModel from '../notification/notification.model';
 import { NotificationCategory, NotificationType } from '../notification/notification.interface';
+import WalletHistoryModel from '../wallet-history/wallet-history.model';
+import { WalletHistoryType } from '../wallet-history/wallet-history.interface';
 
 class WalletSubmissionService {
   async createWalletSubmissionIntoDB(authUser: IAuthUser, payload: CreateWalletSubmissionPayload) {
@@ -78,7 +80,22 @@ class WalletSubmissionService {
       if (!updateWalletBalance.modifiedCount) {
         throw new Error('Update wallet balance failed ');
       }
-      await session.commitTransaction();
+
+      const createdWalletHistory = await WalletHistoryModel.create(
+        [
+          {
+            walletId: existingWallet._id,
+            prevBalance: existingWallet.balance,
+            amount: existingSubmission.amount,
+            type: WalletHistoryType.CREDIT,
+          },
+        ],
+        { session }
+      );
+
+      if (!createdWalletHistory) {
+        throw new Error('Create wallet history failed ');
+      }
 
       NotificationModel.create({
         customerId: existingSubmission.customerId,
@@ -88,7 +105,7 @@ class WalletSubmissionService {
         type: NotificationType.SUCCESS,
         category: NotificationCategory.WALLET_SUBMISSION,
       });
-
+      await session.commitTransaction();
       return await WalletSubmissionModel.findById(existingSubmission._id);
     } catch (error: any) {
       await session.abortTransaction();

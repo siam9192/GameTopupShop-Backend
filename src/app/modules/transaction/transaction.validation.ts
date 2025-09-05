@@ -6,22 +6,19 @@ const updateTransactionStatusValidation = z.object({
   status: z.nativeEnum(TransactionStatus),
 });
 
-
 const makeOrderWalletPaymentValidation = z.object({
-  orderId:z.string().nonempty()
-}
-)
+  orderId: z.string().nonempty(),
+});
 
 const makeOrderLivePaymentValidation = z.object({
-  orderId:z.string().nonempty(),
-  method:z.nativeEnum(LivePaymentMethod)
-})
-
+  orderId: z.string().nonempty(),
+  method: z.nativeEnum(LivePaymentMethod),
+});
 
 const transactionValidations = {
   updateTransactionStatusValidation,
   makeOrderLivePaymentValidation,
-  makeOrderWalletPaymentValidation
+  makeOrderWalletPaymentValidation,
 };
 
 export default transactionValidations;

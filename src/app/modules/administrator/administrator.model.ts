@@ -60,6 +60,7 @@ const AdministratorModelSchema = new Schema<Administrator>(
       default: now(),
     },
     status: {
+      type: String,
       enum: Object.values(AccountStatus),
       default: AccountStatus.ACTIVE,
     },

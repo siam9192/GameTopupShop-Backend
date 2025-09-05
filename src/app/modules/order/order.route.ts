@@ -7,11 +7,10 @@ import orderController from './order.controller';
 const router = Router();
 
 router.get('/', auth(...ALL_ADMINISTRATOR_LEVELS), orderController.getOrders);
-router.get('/my', auth(UserRole.CUSTOMER),orderController.getMyOrders);
+router.get('/my', auth(UserRole.CUSTOMER), orderController.getMyOrders);
 router.get('/:id', auth(...ALL_ROLES), orderController.getOrderById);
 
-router.post('/',auth(UserRole.CUSTOMER),orderController.createOrder)
-
+router.post('/', auth(UserRole.CUSTOMER), orderController.createOrder);
 
 const orderRouter = router;
 export default orderRouter;

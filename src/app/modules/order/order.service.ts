@@ -5,7 +5,13 @@ import { IAuthUser, IPaginationOptions } from '../../types';
 import { OfferStatus } from '../offer/offer.interface';
 import OfferModel from '../offer/offer.model';
 import TopupModel from '../topup/topup.model';
-import { CreateOrderPayload, OrdersFilterPayload, OrderStatus, PaymentStatus, ProductCategory } from './order.interface';
+import {
+  CreateOrderPayload,
+  OrdersFilterPayload,
+  OrderStatus,
+  PaymentStatus,
+  ProductCategory,
+} from './order.interface';
 import OrderModel from './order.model';
 import { objectId } from '../../helpers';
 import { calculatePagination } from '../../helpers/paginationHelper';
@@ -57,25 +63,24 @@ class OrderService {
       status: OrderStatus.PENDING,
     });
   }
-  
-  
-  async getOrdersFromDB (filterPayload:OrdersFilterPayload,paginationOptions:IPaginationOptions) {
-      const { id, customerId,minAmount,maxAmount,status, ...restPayload } = filterPayload;
+
+  async getOrdersFromDB(filterPayload: OrdersFilterPayload, paginationOptions: IPaginationOptions) {
+    const { id, customerId, minAmount, maxAmount, status, ...restPayload } = filterPayload;
     const whereConditions: Record<string, any> = {
-      ...restPayload
+      ...restPayload,
     };
     if (id) {
-        if (!Types.ObjectId.isValid(id)) {
+      if (!Types.ObjectId.isValid(id)) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Invalid id');
       }
       whereConditions._id = objectId(id);
     } else if (customerId) {
-          if (!Types.ObjectId.isValid(customerId)) {
+      if (!Types.ObjectId.isValid(customerId)) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Invalid  customerId');
       }
       whereConditions.customerId = objectId(customerId);
-    } 
-   if (
+    }
+    if (
       (minAmount !== undefined && !isNaN(Number(minAmount))) ||
       (maxAmount !== undefined && !isNaN(Number(maxAmount)))
     ) {
@@ -107,7 +112,7 @@ class OrderService {
     const totalResults = await OrderModel.countDocuments(whereConditions);
 
     const total = await OrderModel.countDocuments();
-    const data:any[] = transactions.map((transaction) => {
+    const data: any[] = transactions.map((transaction) => {
       const { customerId, ...rest } = transaction;
       return {
         ...rest,
@@ -128,19 +133,23 @@ class OrderService {
     };
   }
 
-  async getMyOrdersFromDB (authUser:IAuthUser,filterPayload:OrdersFilterPayload,paginationOptions:IPaginationOptions) {
-      const { id,minAmount,maxAmount,status, ...restPayload } = filterPayload;
+  async getMyOrdersFromDB(
+    authUser: IAuthUser,
+    filterPayload: OrdersFilterPayload,
+    paginationOptions: IPaginationOptions
+  ) {
+    const { id, minAmount, maxAmount, status, ...restPayload } = filterPayload;
     const whereConditions: Record<string, any> = {
-        customerId:objectId(authUser.userId),
-      ...restPayload
+      customerId: objectId(authUser.userId),
+      ...restPayload,
     };
     if (id) {
       if (!Types.ObjectId.isValid(id)) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Invalid id');
       }
       whereConditions._id = objectId(id);
-    } 
-   if (
+    }
+    if (
       (minAmount !== undefined && !isNaN(Number(minAmount))) ||
       (maxAmount !== undefined && !isNaN(Number(maxAmount)))
     ) {
@@ -170,7 +179,7 @@ class OrderService {
     const totalResults = await OrderModel.countDocuments(whereConditions);
 
     const total = await OrderModel.countDocuments();
-    const data:any[] = orders
+    const data: any[] = orders;
     const meta = {
       page,
       limit,
@@ -184,38 +193,29 @@ class OrderService {
     };
   }
 
+  async getOrderByIdFromDB(authUser: IAuthUser, id: string) {
+    const existingOrder = await OrderModel.findById(id).populate(['customerId']).lean();
 
-  async getOrderByIdFromDB (authUser: IAuthUser, id: string) {
-      const existingOrder = await OrderModel.findById(id)
-        .populate(['customerId'])
-        .lean();
-  
-      if (!existingOrder) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
-      }
-  
-      // Access control
-      if (
-        authUser.role === UserRole.CUSTOMER &&
-        authUser.userId !== existingOrder.customerId.toString()
-      ) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
-      }
-  
-      // Format response
-      const { customerId, ...rest } = existingOrder;
-      return  {
-        ...rest,
-        customerId: customerId._id,
-        customer: customerId,
-      } as any
+    if (!existingOrder) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
+    }
 
-      
+    // Access control
+    if (
+      authUser.role === UserRole.CUSTOMER &&
+      authUser.userId !== existingOrder.customerId.toString()
+    ) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
+    }
+
+    // Format response
+    const { customerId, ...rest } = existingOrder;
+    return {
+      ...rest,
+      customerId: customerId._id,
+      customer: customerId,
+    } as any;
   }
-
-
-  
 }
-
 
 export default new OrderService();

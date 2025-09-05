@@ -83,6 +83,7 @@ const CustomerModelSchema = new Schema<Customer>(
       default: now(),
     },
     status: {
+      type: String,
       enum: Object.values(AccountStatus),
       default: AccountStatus.ACTIVE,
     },

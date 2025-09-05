@@ -48,8 +48,8 @@ export interface TransactionsFilterPayload
     customerId: string;
     method: PaymentMethod;
     status: TransactionStatus;
-    minAmount:string
-    maxAmount:string
+    minAmount: string;
+    maxAmount: string;
   }> {}
 
 export interface UpdateTransactionStatusPayload {
@@ -61,7 +61,6 @@ export interface MakeOrderLivePaymentPayload {
   orderId: string;
   method: LivePaymentMethod;
 }
-
 
 export interface MakeWalletPaymentPayload {
   orderId: string;

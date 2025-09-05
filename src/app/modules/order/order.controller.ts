@@ -5,22 +5,18 @@ import Pick from '../../utils/pick';
 import { sendSuccessResponse } from '../../utils/response';
 import orderService from './order.service';
 
-
 class OrderController {
   createOrder = catchAsync(async (req, res) => {
-    const result = await orderService.createOrderIntoDB(
-        req.user,
-    req.body
-    );
+    const result = await orderService.createOrderIntoDB(req.user, req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
-      data:result,
+      data: result,
       message: 'Order created successfully',
     });
   });
-getOrders = catchAsync(async (req, res) => {
+  getOrders = catchAsync(async (req, res) => {
     const result = await orderService.getOrdersFromDB(
-      Pick(req.query, ['id', 'customerId', 'status','minAmount','maxAmount']),
+      Pick(req.query, ['id', 'customerId', 'status', 'minAmount', 'maxAmount']),
       paginationOptionPicker(req.query)
     );
     sendSuccessResponse(res, {
@@ -32,13 +28,13 @@ getOrders = catchAsync(async (req, res) => {
   getMyOrders = catchAsync(async (req, res) => {
     const result = await orderService.getMyOrdersFromDB(
       req.user,
-      Pick(req.query, ['id', 'status','minAmount','maxAmount']),
+      Pick(req.query, ['id', 'status', 'minAmount', 'maxAmount']),
       paginationOptionPicker(req.query)
     );
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       ...result,
-     message: 'Orders retrieved successfully',
+      message: 'Orders retrieved successfully',
     });
   });
 
@@ -50,8 +46,6 @@ getOrders = catchAsync(async (req, res) => {
       message: 'Order retrieved Successfully',
     });
   });
-
-  
 }
 
 export default new OrderController();
