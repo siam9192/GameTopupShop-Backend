@@ -29,20 +29,19 @@ const CurrencyModelSchema = new Schema<Currency>(
   { timestamps: true } // auto add createdAt, updatedAt
 );
 
-CurrencyModelSchema.statics.ensureDefault =  async function () {
-const count = await this.countDocuments();
+CurrencyModelSchema.statics.ensureDefault = async function () {
+  const count = await this.countDocuments();
   if (count === 0) {
-     this.create(DEFAULT_CURRENCIES);
+    this.create(DEFAULT_CURRENCIES);
   }
-  return  null
-}
-
+  return null;
+};
 
 export interface CurrencyModelType extends Model<Currency> {
   ensureDefault(): Promise<Currency>;
 }
 
 // ---------------- Model ----------------
-const CurrencyModel = model<Currency,CurrencyModelType>('Currency', CurrencyModelSchema);
+const CurrencyModel = model<Currency, CurrencyModelType>('Currency', CurrencyModelSchema);
 
 export default CurrencyModel;

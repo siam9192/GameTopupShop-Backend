@@ -7,7 +7,7 @@ import manualPaymentMethodService from './manual-payment-method.service';
 
 class ManualPaymentMethodController {
   createMethod = catchAsync(async (req, res) => {
-    const result = manualPaymentMethodService.createMethodIntoDB(req.body);
+    const result = await manualPaymentMethodService.createMethodIntoDB(req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.CREATED,
       data: result,
@@ -15,7 +15,7 @@ class ManualPaymentMethodController {
     });
   });
   updateMethod = catchAsync(async (req, res) => {
-    const result = manualPaymentMethodService.updateMethodIntoDB(req.params.id, req.body);
+    const result = await manualPaymentMethodService.updateMethodIntoDB(req.params.id, req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -23,7 +23,7 @@ class ManualPaymentMethodController {
     });
   });
   updateMethodStatus = catchAsync(async (req, res) => {
-    const result = manualPaymentMethodService.updateMethodStatus(req.body);
+    const result = await manualPaymentMethodService.updateMethodStatus(req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -32,7 +32,7 @@ class ManualPaymentMethodController {
   });
 
   softDeleteMethod = catchAsync(async (req, res) => {
-    const result = manualPaymentMethodService.softDeleteMethodFromDB(req.params.id);
+    const result = await manualPaymentMethodService.softDeleteMethodFromDB(req.params.id);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -41,31 +41,31 @@ class ManualPaymentMethodController {
   });
 
   getMethods = catchAsync(async (req, res) => {
-    const result = manualPaymentMethodService.getMethodsFromDB(
+    const result = await manualPaymentMethodService.getMethodsFromDB(
       Pick(req.query, ['searchTerm', 'name', 'status']),
       paginationOptionPicker(req.query)
     );
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
-      data: result,
+      ...result,
       message: 'Manual methods retrieved Successfully',
     });
   });
 
   getPublicPaymentMethods = catchAsync(async (req, res) => {
-    const result = manualPaymentMethodService.getPubicMethodsFromDB(
+    const result = await manualPaymentMethodService.getPubicMethodsFromDB(
       Pick(req.query, ['searchTerm', 'name']),
       paginationOptionPicker(req.query)
     );
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
-      data: result,
+      ...result,
       message: 'Manual methods retrieved Successfully',
     });
   });
 
   getMethodById = catchAsync(async (req, res) => {
-    const result = manualPaymentMethodService.getMethodByIdFromDB(req.params.id);
+    const result = await manualPaymentMethodService.getMethodByIdFromDB(req.params.id);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,

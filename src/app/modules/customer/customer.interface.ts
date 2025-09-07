@@ -22,7 +22,9 @@ export interface Customer {
 }
 
 export interface CreateCustomerPayload
-  extends Pick<Customer, 'name' | 'email' | 'password' | 'googleId' | 'facebookId'> {}
+  extends Pick<Customer, 'name' | 'email' | 'password' | 'googleId' | 'facebookId'> {
+  provider?: Provider;
+}
 
 export interface CustomersFilterPayload
   extends Partial<{

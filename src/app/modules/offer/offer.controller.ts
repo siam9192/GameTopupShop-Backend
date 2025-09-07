@@ -48,7 +48,7 @@ class OfferController {
     );
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
-      data: result,
+      ...result,
       message: 'Offers retrieved successfully',
     });
   });
@@ -59,7 +59,7 @@ class OfferController {
     );
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
-      data: result,
+      ...result,
       message: 'Offers retrieved successfully',
     });
   });
@@ -77,7 +77,7 @@ class OfferController {
     const result = await offerService.getEndingSoonOffersFromDB(paginationOptionPicker(req.query));
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
-      data: result,
+      ...result,
       message: 'Offers retrieved successfully',
     });
   });

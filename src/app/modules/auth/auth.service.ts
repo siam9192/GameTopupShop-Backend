@@ -40,7 +40,7 @@ class AuthService {
 
     // Prepare the token payload
     const tokenPayload = {
-      id: customer._id,
+      userId: customer._id,
       role: UserRole.CUSTOMER,
     };
 
@@ -69,7 +69,7 @@ class AuthService {
     // Find the user by email
     const administrator = await AdministratorModel.findOne({
       email: payload.email,
-    }).select('_id email password');
+    }).select('_id email password level');
 
     // Throw an error if the user is not found
     if (!administrator) {
@@ -89,8 +89,8 @@ class AuthService {
 
     // Prepare the token payload
     const tokenPayload = {
-      id: administrator._id,
-      role: UserRole.CUSTOMER,
+      userId: administrator._id,
+      role: administrator.level,
     };
 
     // Generate access token

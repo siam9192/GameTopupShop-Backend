@@ -6,6 +6,7 @@ import { CreateCurrencyPayload, CurrenciesFilterPayload } from './currency.inter
 import CurrencyModel from './currency.model';
 import { calculatePagination } from '../../helpers/paginationHelper';
 import { objectId } from '../../helpers';
+import AppSettingModel from '../app-setting/app-setting.model';
 
 class CurrencyService {
   async createCurrencyIntoDB(payload: CreateCurrencyPayload) {
@@ -31,6 +32,18 @@ class CurrencyService {
   }
 
   async deleteCurrencyFromDB(id: string) {
+    // validate id
+    if (!Types.ObjectId.isValid(id)) throw new AppError(httpStatus.BAD_REQUEST, 'Invalid id');
+    // Fetch data
+    const currency = await CurrencyModel.findOne({
+      _id: objectId(id),
+    });
+    // Check existence
+    if (!currency) throw new AppError(httpStatus.NOT_FOUND, 'Currency not found');
+    const appSetting = await AppSettingModel.findOne();
+    if (appSetting!.currency?.toString() === id) {
+      new AppError(httpStatus.FORBIDDEN, 'Currency in use,Delete not possible');
+    }
     return await CurrencyModel.findByIdAndDelete(id, { new: true });
   }
 

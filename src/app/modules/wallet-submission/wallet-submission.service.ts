@@ -27,6 +27,7 @@ class WalletSubmissionService {
 
     const result = await WalletSubmissionModel.create({
       ...payload,
+      customerId: objectId(authUser.userId),
       methodName: existingMethod.name,
     });
 
@@ -117,11 +118,12 @@ class WalletSubmissionService {
 
   async declineWalletSubmissionIntoDB(id: string, payload: DeclineWalletSubmissionPayload) {
     const existingSubmission = await WalletSubmissionModel.findById(id);
-    if (!existingSubmission) throw new AppError(httpStatus.NOT_FOUND, 'Submission not found');
+    if (!existingSubmission || existingSubmission.status !== WalletSubmissionStatus.PENDING)
+      throw new AppError(httpStatus.NOT_FOUND, 'Submission not found');
 
     const result = await WalletSubmissionModel.findByIdAndUpdate(
       existingSubmission._id,
-      { status: WalletSubmissionStatus.DECLINED },
+      { status: WalletSubmissionStatus.DECLINED, declineReason: payload.declineReason },
       { new: true }
     );
 
@@ -129,7 +131,6 @@ class WalletSubmissionService {
       customerId: existingSubmission.customerId,
       title: 'Wallet Submission Declined',
       message: `Your submission of ${existingSubmission.amount} has been declined. Please check your submission details.`,
-
       visitId: id,
       type: NotificationType.SUCCESS,
       category: NotificationCategory.WALLET_SUBMISSION,
@@ -184,7 +185,9 @@ class WalletSubmissionService {
     const data: any[] = wallets.map(({ customerId, methodId, ...rest }) => ({
       ...rest,
       customer: customerId,
+      customerId: customerId._id,
       method: methodId,
+      methodId: methodId._id,
     }));
     return {
       data,

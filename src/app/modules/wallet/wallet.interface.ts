@@ -20,8 +20,8 @@ export interface Wallet {
 export interface WalletsFilterPayload
   extends Partial<{
     searchTerm: string;
-    name: string;
-    email: string;
+    id: string;
+    customerId: string;
     minBalance: string;
     maxBalance: string;
   }> {}

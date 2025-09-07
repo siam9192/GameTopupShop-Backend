@@ -16,26 +16,30 @@ router.post(
 
 router.patch(
   '/:id/approve',
-  auth(Object.values(AdministratorLevel)),
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   walletSubmissionController.approveWalletSubmission
 );
 
 router.patch(
   '/:id/decline',
-  auth(Object.values(AdministratorLevel)),
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validateRequest(walletSubmissionValidations.declineWalletSubmissionValidation),
   walletSubmissionController.declineWalletSubmission
 );
 
 router.get(
   '/',
-  auth(Object.values(AdministratorLevel)),
-  walletSubmissionController.getMyWalletSubmissions
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  walletSubmissionController.getWalletSubmissions
 );
 
 router.get('/my', auth(UserRole.CUSTOMER), walletSubmissionController.getMyWalletSubmissions);
 
-router.get('/:id', auth(UserRole.CUSTOMER), walletSubmissionController.getWalletSubmissionById);
+router.get(
+  '/:id',
+  auth(UserRole.CUSTOMER, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  walletSubmissionController.getWalletSubmissionById
+);
 
 const walletSubmissionRouter = router;
 

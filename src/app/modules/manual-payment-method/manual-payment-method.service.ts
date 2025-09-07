@@ -17,7 +17,7 @@ class ManualPaymentMethodService {
     // Check if a method already exists with the same name
     const method = await ManualPaymentMethodModel.findOne({
       name: payload.name,
-      status: { $nt: ManualPaymentMethodStatus.DELETED },
+      status: { $ne: ManualPaymentMethodStatus.DELETED },
     });
     if (method) {
       throw new AppError(httpStatus.FORBIDDEN, 'Method already exists using this name');
@@ -32,7 +32,7 @@ class ManualPaymentMethodService {
     // First, check if the method exists
     const method = await ManualPaymentMethodModel.findOne({
       _id: objectId(id),
-      status: { $nt: ManualPaymentMethodStatus.DELETED },
+      status: { $ne: ManualPaymentMethodStatus.DELETED },
     });
     if (!method) {
       throw new AppError(httpStatus.NOT_FOUND, 'Method not found');
@@ -42,8 +42,8 @@ class ManualPaymentMethodService {
     // If name is being changed, ensure the new name is unique
     if (payload.name && method.name !== payload.name) {
       const existing = await ManualPaymentMethodModel.findOne({
-        _id: objectId(id),
-        status: { $nt: ManualPaymentMethodStatus.DELETED },
+        name: payload.name,
+        status: { $ne: ManualPaymentMethodStatus.DELETED },
       });
       if (existing) {
         throw new AppError(httpStatus.FORBIDDEN, 'Method already exists using this name');
@@ -53,11 +53,17 @@ class ManualPaymentMethodService {
     // Update and return the updated document
     return await ManualPaymentMethodModel.findByIdAndUpdate(id, payload, { new: true });
   }
+  async updateMethodStatus(payload: UpdateManualPaymentMethodStatusPayload) {
+    const { id, status } = payload;
+    const method = await ManualPaymentMethodModel.findById(id);
+    if (!method) throw new AppError(httpStatus.NOT_FOUND, 'Method not found');
+    return await ManualPaymentMethodModel.findByIdAndUpdate(id, { status }, { new: true });
+  }
 
   async softDeleteMethodFromDB(id: string) {
     const method = await ManualPaymentMethodModel.findOne({
       _id: objectId(id),
-      status: { $nt: ManualPaymentMethodStatus.DELETED },
+      status: { $ne: ManualPaymentMethodStatus.DELETED },
     });
     if (!method) {
       throw new AppError(httpStatus.NOT_FOUND, 'Method not found');
@@ -68,13 +74,6 @@ class ManualPaymentMethodService {
       { status: ManualPaymentMethodStatus.DELETED },
       { new: true }
     );
-  }
-
-  async updateMethodStatus(payload: UpdateManualPaymentMethodStatusPayload) {
-    const { id, status } = payload;
-    const method = await ManualPaymentMethodModel.findById(id);
-    if (!method) throw new AppError(httpStatus.NOT_FOUND, 'Method not found');
-    return await ManualPaymentMethodModel.findByIdAndUpdate(id, { status }, { new: true });
   }
 
   async getPubicMethodsFromDB(
@@ -145,7 +144,8 @@ class ManualPaymentMethodService {
           },
         ];
       }
-    } else if (Object.keys(otherFilterPayload).length) {
+    }
+    if (Object.keys(otherFilterPayload).length) {
       whereConditions = otherFilterPayload;
     }
 

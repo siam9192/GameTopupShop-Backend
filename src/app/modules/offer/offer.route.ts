@@ -27,7 +27,7 @@ router.patch(
 );
 router.delete('/:id', offerController.softDeleteOffer);
 
-router.get('/', offerController.getOfferById);
+router.get('/', offerController.getOffers);
 router.get('/public', offerController.getPublicOffers);
 router.get('/ending-soon', offerController.getEndingSoonOffers);
 router.get('/:id', offerController.getOfferById);

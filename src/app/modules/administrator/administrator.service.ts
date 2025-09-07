@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import AppError from '../../Errors/AppError';
 import bycryptHelpers from '../../helpers/bycryptHelpers';
 import httpStatus from '../../shared/http-status';
-import { IPaginationOptions } from '../../types';
+import { IAuthUser, IPaginationOptions } from '../../types';
 import CustomerModel from '../customer/customer.model';
 import { AccountStatus, AdministratorLevel } from '../user/user.interface';
 import {
@@ -23,7 +23,7 @@ class AdministratorService {
     const customer = await CustomerModel.findOne({
       email,
       status: {
-        $nt: AccountStatus.DELETED,
+        $ne: AccountStatus.DELETED,
       },
     });
 
@@ -32,7 +32,7 @@ class AdministratorService {
     const administrator = await AdministratorModel.findOne({
       email,
       status: {
-        $nt: AccountStatus.DELETED,
+        $ne: AccountStatus.DELETED,
       },
     });
 
@@ -71,9 +71,7 @@ class AdministratorService {
       whereConditions = otherFilterPayload;
     }
 
-    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions, {
-      limitOverride: 20,
-    });
+    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
 
     const customers = await AdministratorModel.find(whereConditions)
       .sort({ [sortBy]: sortOrder })
@@ -102,7 +100,7 @@ class AdministratorService {
     // Fetch data
     const administrator = await AdministratorModel.findOne({
       _id: objectId(id),
-      status: { $not: AccountStatus.DELETED },
+      status: { $ne: AccountStatus.DELETED },
     });
 
     // Check existence
@@ -111,20 +109,24 @@ class AdministratorService {
     return administrator;
   }
 
-  async getCustomerByIdFromDB(id: string) {
+  async softDeleteAdministratorIntoDB(id: string) {
     // validate id
     if (!Types.ObjectId.isValid(id)) throw new AppError(httpStatus.BAD_REQUEST, 'Invalid id');
 
     // Fetch data
-    const customer = await CustomerModel.findOne({
+    const administrator = await AdministratorModel.findOne({
       _id: objectId(id),
-      status: { $not: AccountStatus.DELETED },
+      status: { $ne: AccountStatus.DELETED },
     });
 
     // Check existence
-    if (!customer) throw new AppError(httpStatus.NOT_FOUND, 'Customer not found');
+    if (!administrator) throw new AppError(httpStatus.NOT_FOUND, 'Administrator not found');
 
-    return customer;
+    await AdministratorModel.updateOne(
+      { _id: administrator._id },
+      { status: AccountStatus.DELETED }
+    );
+    return null;
   }
 
   async updateAdministratorLevelIntoDB(payload: UpdateAdministratorLevelPayload) {
@@ -133,15 +135,10 @@ class AdministratorService {
     // validate id
     if (!Types.ObjectId.isValid(id)) throw new AppError(httpStatus.BAD_REQUEST, 'Invalid id');
 
-    // Validate status
-    if (!Object.values(AdministratorLevel).includes(level)) {
-      throw new AppError(httpStatus.BAD_REQUEST, 'Invalid level');
-    }
-
     // Fetch data
     const administrator = await AdministratorModel.findOne({
       _id: objectId(id),
-      status: { $not: AccountStatus.DELETED },
+      status: { $ne: AccountStatus.DELETED },
     });
 
     // Check existence
@@ -150,12 +147,14 @@ class AdministratorService {
     if (administrator.level === payload.level) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Invalid level');
     }
+    if (administrator.level === AdministratorLevel.SUPER_ADMIN) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Update super admin level not possible');
+    }
+    return await AdministratorModel.findByIdAndUpdate(
+      administrator._id,
 
-    await AdministratorModel.updateOne(
-      {
-        _id: administrator._id,
-      },
-      { level }
+      { level },
+      { new: true }
     );
   }
 
@@ -173,18 +172,16 @@ class AdministratorService {
     // Fetch data
     const administrator = await AdministratorModel.findOne({
       _id: objectId(id),
-      status: { $not: AccountStatus.DELETED },
+      status: { $ne: AccountStatus.DELETED },
     });
 
     // Check existence
     if (!administrator) throw new AppError(httpStatus.NOT_FOUND, 'Administrator not found');
 
-    await AdministratorModel.updateOne(
-      {
-        _id: administrator._id,
-      },
-      { status }
-    );
+    if (administrator.level === AdministratorLevel.SUPER_ADMIN) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Update super admin status not possible');
+    }
+    return await AdministratorModel.findByIdAndUpdate(administrator._id, { status }, { new: true });
   }
 }
 

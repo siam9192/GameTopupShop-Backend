@@ -9,6 +9,6 @@ router.get('/', auth(UserRole.CUSTOMER), walletHistoryController.getMyWalletHist
 
 router.get('/:id', auth(UserRole.CUSTOMER), walletHistoryController.getWalletHistoryById);
 
-const walletHistory = router;
+const walletHistoryRouter = router;
 
-export default walletHistory;
+export default walletHistoryRouter;

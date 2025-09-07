@@ -6,7 +6,7 @@ import notificationService from './notification.service';
 
 class NotificationController {
   getMyNotifications = catchAsync(async (req, res) => {
-    const result = notificationService.getMyNotificationsFromDB(
+    const result = await notificationService.getMyNotificationsFromDB(
       req.user,
       paginationOptionPicker(req.query)
     );
@@ -17,7 +17,7 @@ class NotificationController {
     });
   });
   notificationsSetAsRead = catchAsync(async (req, res) => {
-    const result = notificationService.notificationsSetAsRead(req.user, req.body);
+    const result = await notificationService.notificationsSetAsRead(req.user, req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,

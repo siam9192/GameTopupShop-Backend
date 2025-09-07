@@ -1,26 +1,29 @@
 import { model, now, Schema, Types } from 'mongoose';
 import { Customer } from './customer.interface';
-import { AccountStatus } from '../user/user.interface';
+import { AccountStatus, Provider } from '../user/user.interface';
 
 const CustomerModelSchema = new Schema<Customer>(
   {
     name: {
-      type: {
-        first: {
-          type: String,
-          required: true,
-          minLength: 1,
-          maxLength: 25,
-          trim: true,
+      type: new Schema(
+        {
+          first: {
+            type: String,
+            required: true,
+            minLength: 1,
+            maxLength: 25,
+            trim: true,
+          },
+          last: {
+            type: String,
+            required: true,
+            minLength: 1,
+            maxLength: 25,
+            trim: true,
+          },
         },
-        last: {
-          type: String,
-          required: true,
-          minLength: 1,
-          maxLength: 25,
-          trim: true,
-        },
-      },
+        { _id: false }
+      ),
       required: true,
     },
 
@@ -77,6 +80,11 @@ const CustomerModelSchema = new Schema<Customer>(
       minLength: 1,
       trim: true,
       default: null,
+    },
+    provider: {
+      type: String,
+      enum: Object.values(Provider),
+      required: true,
     },
     passwordLastChangedAt: {
       type: Date,

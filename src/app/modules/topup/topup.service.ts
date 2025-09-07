@@ -30,10 +30,14 @@ class TopupService {
     const startFrom = payload.packages
       ? Math.min(...payload.packages.map((p) => p.price))
       : existingTopup.startFrom;
-    return await TopupModel.findByIdAndUpdate(id, {
-      ...payload,
-      startFrom,
-    });
+    return await TopupModel.findByIdAndUpdate(
+      id,
+      {
+        ...payload,
+        startFrom,
+      },
+      { new: true }
+    );
   }
 
   async updateTopupStatusIntoDB(payload: UpdateTopupStatusPayload) {
@@ -80,9 +84,7 @@ class TopupService {
       whereConditions = otherFilterPayload;
     }
 
-    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions, {
-      limitOverride: 20,
-    });
+    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
 
     const topups = await TopupModel.find(whereConditions)
       .sort({ [sortBy]: sortOrder })
@@ -156,7 +158,7 @@ class TopupService {
   async getTopupByIdFromDB(authUser: IAuthUser | undefined, id: string) {
     const existingTopup = await TopupModel.findOne({
       _id: objectId(id),
-      status: { $not: TopupStatus.DELETED },
+      status: { $ne: TopupStatus.DELETED },
     });
     if (!existingTopup) throw new AppError(httpStatus.NOT_FOUND, 'Topup not found');
     if (

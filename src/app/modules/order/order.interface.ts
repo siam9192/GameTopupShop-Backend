@@ -30,7 +30,7 @@ export type OrderPayment = {
 };
 
 export enum ProductCategory {
-  TOP_UP = 'Top up',
+  TOP_UP = 'Topup',
   OFFER = 'Offer',
 }
 
@@ -65,7 +65,7 @@ export type OrdersFilterPayload = Partial<{
   category: ProductCategory;
 }>;
 
-export type UpdateOrderStatus = {
+export type UpdateOrderStatusPayload = {
   id: string;
   status: OrderStatus;
 };

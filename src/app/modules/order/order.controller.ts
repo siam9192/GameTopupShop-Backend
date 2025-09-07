@@ -7,11 +7,19 @@ import orderService from './order.service';
 
 class OrderController {
   createOrder = catchAsync(async (req, res) => {
-    const result = await orderService.createOrderIntoDB(req.user, req.body);
+    const result = await orderService.updateOrderStatusIntoDB(req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
-      message: 'Order created successfully',
+      message: 'Order status updated',
+    });
+  });
+  updateOrderStatus = catchAsync(async (req, res) => {
+    const result = await orderService.updateOrderStatusIntoDB(req.body);
+    sendSuccessResponse(res, {
+      statusCode: httpStatus.OK,
+      data: result,
+      message: 'Order updated successfully',
     });
   });
   getOrders = catchAsync(async (req, res) => {

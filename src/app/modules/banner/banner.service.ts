@@ -17,7 +17,8 @@ class BannerService {
     return await BannerModel.findByIdAndUpdate(id, payload, { new: true });
   }
   async deleteBannerFromDB(id: string) {
-    return await BannerModel.findByIdAndDelete(id, { new: true });
+    await BannerModel.findByIdAndDelete(id, { new: true });
+    return null;
   }
 
   async getBannersFromDB(paginationOptions: IPaginationOptions) {

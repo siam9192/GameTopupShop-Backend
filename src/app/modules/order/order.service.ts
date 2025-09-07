@@ -11,11 +11,14 @@ import {
   OrderStatus,
   PaymentStatus,
   ProductCategory,
+  UpdateOrderStatusPayload,
 } from './order.interface';
 import OrderModel from './order.model';
 import { objectId } from '../../helpers';
 import { calculatePagination } from '../../helpers/paginationHelper';
 import { UserRole } from '../user/user.interface';
+import NotificationModel from '../notification/notification.model';
+import { NotificationCategory } from '../notification/notification.interface';
 
 class OrderService {
   async createOrderIntoDB(authUser: IAuthUser, payload: CreateOrderPayload) {
@@ -35,6 +38,7 @@ class OrderService {
         name: product.name,
         package: pkg.name,
         image: product.coverPhoto,
+        category: payload.category,
         price: pkg.price,
         quantity,
       };
@@ -47,6 +51,7 @@ class OrderService {
         productId,
         name: product.name,
         image: product.coverPhoto,
+        category: payload.category,
         price: product.price,
         quantity,
       };
@@ -56,6 +61,7 @@ class OrderService {
       customerId: authUser.userId,
       product: productData,
       fieldsInfo,
+
       payment: {
         amount: productData.price * quantity,
         status: PaymentStatus.UNPAID,
@@ -203,7 +209,7 @@ class OrderService {
     // Access control
     if (
       authUser.role === UserRole.CUSTOMER &&
-      authUser.userId !== existingOrder.customerId.toString()
+      authUser.userId !== existingOrder.customerId._id.toString()
     ) {
       throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
     }
@@ -215,6 +221,50 @@ class OrderService {
       customerId: customerId._id,
       customer: customerId,
     } as any;
+  }
+
+  async updateOrderStatusIntoDB(payload: UpdateOrderStatusPayload) {
+    const { id, status } = payload;
+    const order = await OrderModel.findById(id).lean();
+
+    if (!order) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
+    }
+
+    if (order.status === status) {
+      throw new AppError(httpStatus.FORBIDDEN, `Already ${status}`);
+    }
+
+    if (status === OrderStatus.COMPLETED) {
+      await NotificationModel.create({
+        customerId: order.customerId,
+        title: 'Order delivered',
+        message: 'Your order has been successfully delivered. Thank you for shopping with us!',
+        type: 'Info',
+        category: NotificationCategory.ORDER,
+        visitId: id,
+      });
+    } else if (status === OrderStatus.FAILED) {
+      await NotificationModel.create({
+        customerId: order.customerId,
+        title: 'Order delivery failed',
+        message: 'We couldn’t deliver your order. Please contact support or try again.',
+        type: 'Info',
+        category: NotificationCategory.ORDER,
+        visitId: id,
+      });
+    } else if (status === OrderStatus.REFUNDED) {
+      await NotificationModel.create({
+        customerId: order.customerId,
+        title: 'Order Refunded',
+        message:
+          'We couldn’t deliver your order, so your payment has been refunded. Please contact support if you need assistance.',
+        type: 'Info',
+        category: NotificationCategory.ORDER,
+        visitId: id,
+      });
+    }
+    return await OrderModel.findByIdAndUpdate(id, { status }, { new: true });
   }
 }
 

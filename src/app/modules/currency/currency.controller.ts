@@ -7,7 +7,7 @@ import currencyService from './currency.service';
 
 class CurrencyController {
   createCurrency = catchAsync(async (req, res) => {
-    const result = currencyService.createCurrencyIntoDB(req.body);
+    const result = await currencyService.createCurrencyIntoDB(req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.CREATED,
       data: result,
@@ -15,7 +15,7 @@ class CurrencyController {
     });
   });
   updateCurrency = catchAsync(async (req, res) => {
-    const result = currencyService.updateCurrencyIntoDB(req.params.id, req.body);
+    const result = await currencyService.updateCurrencyIntoDB(req.params.id, req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -23,7 +23,7 @@ class CurrencyController {
     });
   });
   deleteCurrency = catchAsync(async (req, res) => {
-    const result = currencyService.deleteCurrencyFromDB(req.params.id);
+    const result = await currencyService.deleteCurrencyFromDB(req.params.id);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -31,7 +31,7 @@ class CurrencyController {
     });
   });
   getCurrencies = catchAsync(async (req, res) => {
-    const result = currencyService.getCurrenciesFromDB(
+    const result = await currencyService.getCurrenciesFromDB(
       Pick(req.query, ['searchTerm', 'status']),
       paginationOptionPicker(req.query)
     );
@@ -42,7 +42,7 @@ class CurrencyController {
     });
   });
   getCurrencyById = catchAsync(async (req, res) => {
-    const result = currencyService.getCurrencyByIdFromDB(req.params.id);
+    const result = await currencyService.getCurrencyByIdFromDB(req.params.id);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,

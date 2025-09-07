@@ -6,7 +6,6 @@ const createAdministratorValidation = z.object({
     first: z.string().nonempty().max(25),
     last: z.string().nonempty().max(25),
   }),
-  fullName: z.string().nonempty().max(50),
   profilePicture: z.string().url(),
   level: z.nativeEnum(AdministratorLevel),
   email: z.string().email(),
@@ -15,12 +14,12 @@ const createAdministratorValidation = z.object({
 
 const updateAdministratorStatusIntoDB = z.object({
   id: z.string().nonempty(),
-  status: z.nativeEnum(AccountStatus),
+  status: z.enum([AccountStatus.ACTIVE, AccountStatus.BLOCKED]),
 });
 
 const updateAdministratorLevelIntoDB = z.object({
   id: z.string().nonempty(),
-  status: z.nativeEnum(AdministratorLevel),
+  level: z.nativeEnum(AdministratorLevel),
 });
 
 const administratorValidations = {

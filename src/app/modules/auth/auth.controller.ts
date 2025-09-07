@@ -6,7 +6,8 @@ import catchAsync from '../../utils/catchAsync';
 
 class AuthController {
   customerSignUp = catchAsync(async (req, res) => {
-    const result = authService.customerSignup(req.body);
+    const result = await authService.customerSignup(req.body);
+
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -14,7 +15,15 @@ class AuthController {
     });
   });
   customerSignin = catchAsync(async (req, res) => {
-    const result = authService.customerSignin(req.body);
+    const result = await authService.customerSignin(req.body);
+    sendSuccessResponse(res, {
+      statusCode: httpStatus.OK,
+      data: result,
+      message: 'Signin successful',
+    });
+  });
+  administratorSignin = catchAsync(async (req, res) => {
+    const result = await authService.administratorSignIn(req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -23,7 +32,7 @@ class AuthController {
   });
 
   changePassword = catchAsync(async (req, res) => {
-    const result = await authService.changePassword;
+    const result = await authService.changePassword(req.user, req.body);
     sendSuccessResponse(res, {
       message: 'Password has been changed successfully',
       statusCode: httpStatus.OK,
@@ -32,7 +41,7 @@ class AuthController {
   });
 
   getNewAccessToken = catchAsync(async (req, res) => {
-    const result = await authService.getNewAccessToken(req.body);
+    const result = await authService.getNewAccessToken(req.body.refreshToken);
     sendSuccessResponse(res, {
       message: 'New access token retrieved successfully',
       statusCode: httpStatus.OK,

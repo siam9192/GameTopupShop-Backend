@@ -1,42 +1,46 @@
 import { Router } from 'express';
 
 import auth from '../../middlewares/auth';
-import { AdministratorLevel } from '../user/user.interface';
+import { UserRole } from '../user/user.interface';
 import manualPaymentMethodController from './manual-payment-method.controller';
 import validateRequest from '../../middlewares/validateRequest';
 import manualPaymentMethodValidations from './manual-payment-method.validation';
 
 const router = Router();
 
-router.get('/', auth(Object.values(AdministratorLevel)), manualPaymentMethodController.getMethods);
+router.get(
+  '/',
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  manualPaymentMethodController.getMethods
+);
 router.get('/public', manualPaymentMethodController.getPublicPaymentMethods);
 router.get(
   '/:id',
-  auth(Object.values(AdministratorLevel)),
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   manualPaymentMethodController.getMethodById
 );
 
 router.post(
   '/',
-  auth(Object.values(AdministratorLevel)),
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validateRequest(manualPaymentMethodValidations.createManualPaymentMethodValidation),
   manualPaymentMethodController.createMethod
 );
 router.put(
-  '/',
-  auth(Object.values(AdministratorLevel)),
+  '/:id',
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validateRequest(manualPaymentMethodValidations.updateManualPaymentMethodValidation),
   manualPaymentMethodController.updateMethod
 );
 router.patch(
-  '/',
-  auth(Object.values(AdministratorLevel)),
+  '/status',
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validateRequest(manualPaymentMethodValidations.updateManualPaymentMethodStatusValidation),
   manualPaymentMethodController.updateMethodStatus
 );
 router.delete(
-  '/',
-  auth(Object.values(AdministratorLevel)),
+  '/:id',
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   manualPaymentMethodController.softDeleteMethod
 );
 

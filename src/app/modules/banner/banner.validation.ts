@@ -6,11 +6,13 @@ const createBannerValidation = z.object({
   link: z.string().url(),
 });
 
-const updateBannerValidation = z.object({
-  image: z.string().url(),
-  link: z.string().url(),
-  status: z.nativeEnum(BannerStatus),
-});
+const updateBannerValidation = z
+  .object({
+    image: z.string().url(),
+    link: z.string().url(),
+    status: z.nativeEnum(BannerStatus),
+  })
+  .partial();
 
 const bannerValidations = {
   createBannerValidation,

@@ -8,18 +8,18 @@ import customerService from './customer.service';
 
 class CustomerController {
   getCustomers = catchAsync(async (req, res) => {
-    const result = customerService.getCustomersFromDB(
+    const result = await customerService.getCustomersFromDB(
       Pick(req.query, ['searchTerm', 'fullName', 'email', 'status']),
       paginationOptionPicker(req.query)
     );
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
-      data: result,
-      message: 'Customers retrieved Successfully',
+      ...result,
+      message: 'Customers retrieved successfully',
     });
   });
   getCustomerById = catchAsync(async (req, res) => {
-    const result = customerService.getCustomerByIdFromDB(req.params.id);
+    const result = await customerService.getCustomerByIdFromDB(req.params.id);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -27,11 +27,11 @@ class CustomerController {
     });
   });
   changeCustomerStatus = catchAsync(async (req, res) => {
-    const result = customerService.changeCustomerStatusIntoDB(req.body);
+    const result = await customerService.changeCustomerStatusIntoDB(req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
-      message: 'Customers retrieved Successfully',
+      message: 'Customer status updated successfully',
     });
   });
 }

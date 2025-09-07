@@ -1,6 +1,7 @@
+import bycryptHelpers from '../helpers/bycryptHelpers';
 import { AppStatus } from '../modules/app-setting/app-setting.interface';
 import { CurrencyStatus } from '../modules/currency/currency.interface';
-import { AdministratorLevel, UserRole } from '../modules/user/user.interface';
+import { AccountStatus, AdministratorLevel, UserRole } from '../modules/user/user.interface';
 
 export const PAGINATION_OPTION_KEYS = ['page', 'limit', 'sortBy', 'sortOrder'];
 
@@ -50,30 +51,43 @@ export const DEFAULT_APP_SETTING = {
   status: AppStatus.OPEN,
 };
 
-
-export const DEFAULT_CURRENCIES  =  [
+export const DEFAULT_CURRENCIES = [
   {
-    name: "Bangladeshi Taka",
-    code: "BDT",
-    symbol: "৳",
+    name: 'Bangladeshi Taka',
+    code: 'BDT',
+    symbol: '৳',
     status: CurrencyStatus.ACTIVE,
   },
   {
-    name: "United States Dollar",
-    code: "USD",
-    symbol: "$",
+    name: 'United States Dollar',
+    code: 'USD',
+    symbol: '$',
     status: CurrencyStatus.ACTIVE,
   },
   {
-    name: "Euro",
-    code: "EUR",
-    symbol: "€",
+    name: 'Euro',
+    code: 'EUR',
+    symbol: '€',
     status: CurrencyStatus.ACTIVE,
   },
   {
-    name: "Indian Rupee",
-    code: "INR",
-    symbol: "₹",
+    name: 'Indian Rupee',
+    code: 'INR',
+    symbol: '₹',
     status: CurrencyStatus.ACTIVE,
   },
 ];
+
+export const DEFAULT_SUPER_ADMIN = {
+  name: {
+    first: 'Arafat Hasan',
+    last: 'Siam',
+  },
+  fullName: 'Arafat Hasan Siam',
+  level: AdministratorLevel.SUPER_ADMIN,
+  profilePicture:
+    'https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D',
+  password: bycryptHelpers.hash('123456'),
+  email: 'superadmin@gmail.com',
+  status: AccountStatus.ACTIVE,
+};

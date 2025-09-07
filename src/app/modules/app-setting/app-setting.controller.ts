@@ -5,7 +5,7 @@ import appSettingService from './app-setting.service';
 
 class AppSettingController {
   updateAppSetting = catchAsync(async (req, res) => {
-    const result = appSettingService.updateAppSetting(req.body);
+    const result = await appSettingService.updateAppSetting(req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -13,7 +13,7 @@ class AppSettingController {
     });
   });
   getAppSetting = catchAsync(async (req, res) => {
-    const result = appSettingService.getAppSettingFromDB();
+    const result = await appSettingService.getAppSettingFromDB();
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,

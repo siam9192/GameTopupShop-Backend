@@ -4,8 +4,6 @@ import { ALL_ADMINISTRATOR_LEVELS } from '../../utils/constant';
 import topupController from './topup.controller';
 import topupValidations from './topup.validation';
 import validateRequest from '../../middlewares/validateRequest';
-import offerValidations from '../offer/offer.validation';
-
 const router = Router();
 
 router.post(
@@ -17,13 +15,13 @@ router.post(
 router.put(
   '/:id',
   auth(...ALL_ADMINISTRATOR_LEVELS),
-  validateRequest(offerValidations.updateOfferValidation),
+  validateRequest(topupValidations.updateTopupValidation),
   topupController.updateTopup
 );
 router.patch(
   '/status',
   auth(...ALL_ADMINISTRATOR_LEVELS),
-  validateRequest(offerValidations.updateOfferStatus),
+  validateRequest(topupValidations.updateTopupStatus),
   topupController.updateTopupStatus
 );
 router.delete('/:id', topupController.softDeleteTopup);

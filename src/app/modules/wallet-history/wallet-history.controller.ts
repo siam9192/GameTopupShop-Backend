@@ -6,7 +6,7 @@ import walletHistoryService from './wallet-history.service';
 
 class WalletHistoryController {
   getMyWalletHistories = catchAsync(async (req, res) => {
-    const result = walletHistoryService.getMyWalletHistoriesFromDB(
+    const result = await walletHistoryService.getMyWalletHistoriesFromDB(
       req.user,
       paginationOptionPicker(req.query)
     );
@@ -17,7 +17,7 @@ class WalletHistoryController {
     });
   });
   getWalletHistoryById = catchAsync(async (req, res) => {
-    const result = walletHistoryService.getWalletHistoryByIdFromDB(req.user, req.params.id);
+    const result = await walletHistoryService.getWalletHistoryByIdFromDB(req.user, req.params.id);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,

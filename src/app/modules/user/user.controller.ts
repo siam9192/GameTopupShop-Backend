@@ -5,7 +5,7 @@ import userService from './user.service';
 
 class UserController {
   updateUserProfile = catchAsync(async (req, res) => {
-    const result = userService.updateUserProfileIntoDB(req.user, req.body);
+    const result = await userService.updateUserProfileIntoDB(req.user, req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -14,7 +14,7 @@ class UserController {
   });
 
   getCurrentUser = catchAsync(async (req, res) => {
-    const result = userService.getCurrentUserFromDB(req.user);
+    const result = await userService.getCurrentUserFromDB(req.user);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,

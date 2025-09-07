@@ -25,7 +25,7 @@ const ManualPaymentMethodModelSchema = new Schema<ManualPaymentMethod>(
     status: {
       type: String,
       enum: Object.values(ManualPaymentMethodStatus),
-
+      default: ManualPaymentMethodStatus.ACTIVE,
       required: true,
     },
   },

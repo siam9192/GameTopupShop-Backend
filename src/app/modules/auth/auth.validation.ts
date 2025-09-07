@@ -1,11 +1,5 @@
 import { z } from 'zod';
-const ChangePasswordValidation = z.object({
-  oldPassword: z.string().nonempty('Old password is required'),
-  newPassword: z
-    .string()
-    .min(6, { message: 'Password must be at least 6 characters long' })
-    .max(32, { message: 'Password must be at least 6 characters and Maximum 32 characters longs' }),
-});
+
 const customerSignupValidation = z.object({
   name: z.object({
     first: z.string().nonempty().max(25),

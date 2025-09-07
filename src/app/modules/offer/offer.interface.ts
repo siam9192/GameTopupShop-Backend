@@ -24,9 +24,9 @@ export type OfferInfoField = {
 };
 
 export enum OfferInfoFieldType {
-  TEXT = 'Text',
-  NUMBER = 'Number',
-  TEXTAREA = 'Textarea',
+  TEXT = 'text',
+  NUMBER = 'number',
+  TEXTAREA = 'textarea',
 }
 
 export enum OfferStatus {

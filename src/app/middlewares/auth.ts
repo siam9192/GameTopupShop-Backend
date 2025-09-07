@@ -31,6 +31,7 @@ function auth(...requiredRoles: (UserRole | AdministratorLevel)[]) {
     }
 
     const { role, userId, iat } = decoded;
+    console.log(decoded);
 
     // checking if the user is exist
     const user =

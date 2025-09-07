@@ -3,11 +3,11 @@ import { Notification, NotificationCategory, NotificationType } from './notifica
 
 const NotificationModelSchema = new Schema<Notification>(
   {
-    customerId: { type: Schema.Types.ObjectId, ref: 'Customer', required: true },
+    customerId: { type: Schema.Types.ObjectId, ref: 'Customer', default: null },
     administratorId: {
       type: Schema.Types.ObjectId,
       ref: 'Administrator',
-      required: true,
+      default: null,
     },
     title: { type: String, required: true },
     message: { type: String, required: true },

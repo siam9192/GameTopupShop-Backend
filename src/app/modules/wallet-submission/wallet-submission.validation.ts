@@ -3,7 +3,6 @@ import { z } from 'zod';
 
 const createWalletSubmissionValidation = z.object({
   methodId: z.string().nonempty(),
-  methodName: z.string().nonempty(),
   number: z.string().nonempty(),
   amount: z.number().min(0),
   transactionId: z.string().nonempty(),

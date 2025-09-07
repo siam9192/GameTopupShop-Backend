@@ -12,7 +12,7 @@ import WalletModel from '../wallet/wallet.model';
 import { IPaginationOptions } from '../../types';
 import { calculatePagination } from '../../helpers/paginationHelper';
 import { objectId } from '../../helpers';
-import { AccountStatus } from '../user/user.interface';
+import { AccountStatus, Provider } from '../user/user.interface';
 
 class CustomerService {
   async createCustomer(payload: CreateCustomerPayload) {
@@ -24,6 +24,7 @@ class CustomerService {
     if (email && password) {
       query = { email };
       newCustomer.password = await bcrypt.hash(password, 10);
+      newCustomer.provider = Provider.EMAIL_PASSWORD;
     } else if (googleId) {
       query = { googleId };
       newCustomer.googleId = googleId;
@@ -33,8 +34,8 @@ class CustomerService {
     } else {
       throw new AppError(httpStatus.BAD_REQUEST, 'Invalid customer payload');
     }
-
     const isExist = await CustomerModel.findOne(query);
+
     if (isExist) {
       throw new AppError(httpStatus.FORBIDDEN, 'Already exist');
     }
@@ -90,9 +91,7 @@ class CustomerService {
       whereConditions = otherFilterPayload;
     }
 
-    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions, {
-      limitOverride: 20,
-    });
+    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
 
     const customers = await CustomerModel.find(whereConditions)
       .sort({ [sortBy]: sortOrder })
@@ -121,7 +120,7 @@ class CustomerService {
     // Fetch data
     const customer = await CustomerModel.findOne({
       _id: objectId(id),
-      status: { $not: AccountStatus.DELETED },
+      status: { $ne: AccountStatus.DELETED },
     });
 
     // Check existence
@@ -144,17 +143,18 @@ class CustomerService {
     // Fetch data
     const customer = await CustomerModel.findOne({
       _id: objectId(id),
-      status: { $not: AccountStatus.DELETED },
+      status: { $ne: AccountStatus.DELETED },
     });
 
     // Check existence
     if (!customer) throw new AppError(httpStatus.NOT_FOUND, 'Customer not found');
 
-    await CustomerModel.updateOne(
+    return await CustomerModel.findByIdAndUpdate(
+      customer._id,
+      { status },
       {
-        _id: customer._id,
-      },
-      { status }
+        new: true,
+      }
     );
   }
   async updateCustomerProfile() {}

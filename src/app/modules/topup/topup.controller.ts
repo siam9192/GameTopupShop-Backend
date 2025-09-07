@@ -48,7 +48,7 @@ class TopupController {
     );
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
-      data: result,
+      ...result,
       message: 'Topups retrieved successfully',
     });
   });
@@ -59,7 +59,7 @@ class TopupController {
     );
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
-      data: result,
+      ...result,
       message: 'Topups retrieved successfully',
     });
   });
@@ -77,7 +77,7 @@ class TopupController {
     const result = await topupService.getFeaturedTopupsFromDB(paginationOptionPicker(req.query));
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
-      data: result,
+      ...result,
       message: 'Topups retrieved successfully',
     });
   });

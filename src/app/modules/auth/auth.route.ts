@@ -20,6 +20,12 @@ router.post(
 );
 
 router.post(
+  '/administrator-signin',
+  validateRequest(authValidations.customerSignInValidation),
+  authController.administratorSignin
+);
+
+router.patch(
   '/change-password',
   auth(...ALL_ROLES),
   validateRequest(authValidations.changePasswordValidation),

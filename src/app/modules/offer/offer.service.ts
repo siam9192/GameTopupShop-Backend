@@ -18,10 +18,18 @@ import { x } from 'pdfkit';
 class OfferService {
   async createOfferIntoDB(payload: CreateOfferPayload) {
     const { startDate, endDate } = payload;
-    if (new Date().getTime() > new Date(startDate).getTime()) {
-      throw new AppError(httpStatus.FORBIDDEN, 'Invalid start date ');
-    } else if (new Date(endDate).getTime() < new Date(startDate).getTime()) {
-      throw new AppError(httpStatus.FORBIDDEN, 'Start date can not be getter than end date ');
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const now = new Date();
+    // ❌ invalid if start is in the future
+    if (start.getTime() > now.getTime()) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Invalid start date');
+    }
+
+    // ❌ invalid if end is before start
+    if (end.getTime() < start.getTime()) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Start date cannot be greater than end date');
     }
 
     return await OfferModel.create({
@@ -66,7 +74,9 @@ class OfferService {
   async updateOfferStatusIntoDB(payload: UpdateOfferStatusPayload) {
     const { id, status } = payload;
     const existingOffer = await OfferModel.findById(id);
-    if (!existingOffer) throw new AppError(httpStatus.NOT_FOUND, 'Offer not found');
+    if (!existingOffer || existingOffer.status === OfferStatus.DELETED)
+      throw new AppError(httpStatus.NOT_FOUND, 'Offer not found');
+
     return await OfferModel.findByIdAndUpdate(
       id,
       {
@@ -79,8 +89,9 @@ class OfferService {
   async softDeleteOfferFromDB(id: string) {
     const existingOffer = await OfferModel.findOne({
       _id: objectId(id),
-      status: { $not: OfferStatus.DELETED },
+      status: { $ne: OfferStatus.DELETED },
     });
+
     if (!existingOffer) throw new AppError(httpStatus.NOT_FOUND, 'Offer not found');
     await OfferModel.findByIdAndUpdate(id, { status: OfferStatus.DELETED }, { new: true });
     return null;
@@ -185,7 +196,7 @@ class OfferService {
   async getOfferByIdFromDB(authUser: IAuthUser | undefined, id: string) {
     const existingOffer = await OfferModel.findOne({
       _id: objectId(id),
-      status: { $not: OfferStatus.DELETED },
+      status: { $ne: OfferStatus.DELETED },
     });
     if (!existingOffer) throw new AppError(httpStatus.NOT_FOUND, 'Offer not found');
     if (
@@ -199,7 +210,7 @@ class OfferService {
   }
   async getEndingSoonOffersFromDB(paginationOptions: IPaginationOptions) {
     const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
-    const offers = await OfferModel.find()
+    const offers = await OfferModel.find({ status: OfferStatus.Running })
       .sort({ [sortBy]: sortOrder })
       .skip(skip)
       .limit(limit);

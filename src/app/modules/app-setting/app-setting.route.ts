@@ -15,7 +15,7 @@ router.put(
   appSettingController.updateAppSetting
 );
 
-router.get('/', auth(...ALL_ADMINISTRATOR_LEVELS), appSettingController.getAppSetting);
+router.get('/', appSettingController.getAppSetting);
 
 const appSettingRouter = router;
 export default appSettingRouter;

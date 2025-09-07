@@ -4,6 +4,7 @@ import { AnyZodObject, ZodEffects } from 'zod';
 const validateRequest = (zodSchema: AnyZodObject | ZodEffects<AnyZodObject>): any => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log(req.body);
       zodSchema.parse(req.body);
 
       next();

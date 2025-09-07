@@ -4,7 +4,6 @@ import { AdministratorLevel } from '../user/user.interface';
 import validateRequest from '../../middlewares/validateRequest';
 import administratorValidations from './administrator.validation';
 import administratorController from './administrator.controller';
-import { ALL_ADMINISTRATOR_LEVELS } from '../../utils/constant';
 
 const router = Router();
 
@@ -17,21 +16,30 @@ router.post(
 
 router.patch(
   '/level',
-  auth(...ALL_ADMINISTRATOR_LEVELS),
+  auth(AdministratorLevel.SUPER_ADMIN),
   validateRequest(administratorValidations.updateAdministratorLevelIntoDB),
   administratorController.updateAdministratorLevel
 );
 
 router.patch(
   '/status',
-  auth(...ALL_ADMINISTRATOR_LEVELS),
+  auth(AdministratorLevel.SUPER_ADMIN),
   validateRequest(administratorValidations.updateAdministratorStatusIntoDB),
   administratorController.updateAdministratorStatus
 );
 
-router.get('/', auth(...ALL_ADMINISTRATOR_LEVELS), administratorController.getAdministrators);
+router.delete(
+  '/:id',
+  auth(AdministratorLevel.SUPER_ADMIN),
+  administratorController.softDeleteAdministrator
+);
 
-router.get('/:id', auth(...ALL_ADMINISTRATOR_LEVELS), administratorController.getAdministratorById);
+router.get('/', auth(AdministratorLevel.SUPER_ADMIN), administratorController.getAdministrators);
+router.get(
+  '/:id',
+  auth(AdministratorLevel.SUPER_ADMIN),
+  administratorController.getAdministratorById
+);
 
 const administratorRouter = router;
 export default administratorRouter;

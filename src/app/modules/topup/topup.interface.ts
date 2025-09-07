@@ -32,9 +32,9 @@ export type TopupInfoField = {
 };
 
 export enum TopupInfoFieldType {
-  TEXT = 'Text',
-  NUMBER = 'Number',
-  TEXTAREA = 'Textarea',
+  TEXT = 'text',
+  NUMBER = 'number',
+  TEXTAREA = 'textarea',
 }
 
 export enum TopupStatus {

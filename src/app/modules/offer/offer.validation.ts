@@ -11,16 +11,16 @@ const createOfferValidation = z.object({
       name: z.string().nonempty().max(100),
       placeholder: z.string().nonempty().max(100).optional(),
       type: z.nativeEnum(OfferInfoFieldType),
-      minLength: z.number().nonnegative(),
-      maxLength: z.number().nonnegative(),
-      min: z.number().nonnegative(),
-      max: z.number().nonnegative(),
+      minLength: z.number().nonnegative().optional(),
+      maxLength: z.number().nonnegative().optional(),
+      min: z.number().nonnegative().optional(),
+      max: z.number().nonnegative().optional(),
       optional: z.boolean(),
     })
   ),
   price: z.number().min(0),
-  startDate: z.string().datetime(),
-  endDate: z.string().datetime(),
+  startDate: z.string().date(),
+  endDate: z.string().date(),
 });
 
 const updateOfferValidation = createOfferValidation.partial();

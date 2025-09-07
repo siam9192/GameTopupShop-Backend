@@ -9,12 +9,13 @@ import httpStatus from '../../shared/http-status';
 
 class WalletService {
   async getWalletsFromDB(payload: WalletsFilterPayload, paginationOptions: IPaginationOptions) {
-    const { searchTerm, minBalance, maxBalance } = payload;
+    const { id, customerId, minBalance, maxBalance } = payload;
     let whereConditions: any = {};
-    if (searchTerm) {
-      if (Types.ObjectId.isValid(searchTerm)) {
-        whereConditions.customerId = searchTerm;
-      }
+
+    if (id && Types.ObjectId.isValid(id)) {
+      whereConditions._id = objectId(id);
+    } else if (customerId && Types.ObjectId.isValid(customerId)) {
+      whereConditions.customerId = objectId(customerId);
     }
 
     if (
@@ -32,9 +33,7 @@ class WalletService {
       }
     }
 
-    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions, {
-      limitOverride: 20,
-    });
+    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
 
     const wallets = await WalletModel.find(whereConditions)
       .sort({ [sortBy]: sortOrder })
@@ -48,6 +47,7 @@ class WalletService {
     const total = await WalletModel.countDocuments();
     const data: any[] = wallets.map(({ customerId, ...rest }) => ({
       ...rest,
+      customerId: customerId._id,
       customer: customerId,
     }));
     return {
@@ -84,12 +84,19 @@ class WalletService {
     // Fetch data
     const wallet = await WalletModel.findOne({
       _id: objectId(id),
-    });
+    })
+      .populate('customerId')
+      .lean();
 
     // Check existence
     if (!wallet) throw new AppError(httpStatus.NOT_FOUND, 'wallet not found');
 
-    return wallet;
+    const { customerId, ...rest } = wallet;
+    return {
+      ...rest,
+      customerId: customerId._id,
+      customer: customerId,
+    };
   }
 
   async updateWalletBalanceIntoDB(payload: UpdateWalletBalancePayload) {

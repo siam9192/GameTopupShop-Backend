@@ -42,6 +42,6 @@ const OfferModelSchema: Schema<Offer> = new Schema({
   },
 });
 
-const OfferModel = model<Offer>('', OfferModelSchema);
+const OfferModel = model<Offer>('Offer', OfferModelSchema);
 
 export default OfferModel;

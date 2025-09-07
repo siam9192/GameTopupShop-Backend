@@ -26,7 +26,6 @@ export const GlobalErrorHandler: any = (
       message: 'Something went wrong',
     },
   ];
-
   if (err?.name === 'CastError') {
     const errHandler = HandleCastError(err);
     statusCode = errHandler.statusCode;

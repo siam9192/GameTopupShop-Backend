@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ProductCategory } from './order.interface';
+import { OrderStatus, ProductCategory } from './order.interface';
 
 const createOrderValidation = z
   .object({
@@ -28,8 +28,14 @@ const createOrderValidation = z
     }
   );
 
+const updateOrderStatusValidation = z.object({
+  id: z.string(),
+  status: z.nativeEnum(OrderStatus),
+});
+
 const orderValidations = {
   createOrderValidation,
+  updateOrderStatusValidation,
 };
 
 export default orderValidations;

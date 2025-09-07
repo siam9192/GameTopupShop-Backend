@@ -4,26 +4,28 @@ import bannerValidations from './banner.validation';
 
 import bannerController from './banner.controller';
 import auth from '../../middlewares/auth';
-import { ALL_ADMINISTRATOR_LEVELS } from '../../utils/constant';
+
+import { UserRole } from '../user/user.interface';
 
 const router = Router();
 
 router.post(
   '/',
-  auth(...ALL_ADMINISTRATOR_LEVELS),
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validateRequest(bannerValidations.createBannerValidation),
   bannerController.createBanner
 );
 router.put(
-  '/',
-  auth(...ALL_ADMINISTRATOR_LEVELS),
+  '/:id',
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validateRequest(bannerValidations.updateBannerValidation),
   bannerController.updateBanner
 );
-router.delete('/:id', auth(...ALL_ADMINISTRATOR_LEVELS), bannerController.deleteBanner);
+router.delete('/:id', auth(UserRole.ADMIN, UserRole.SUPER_ADMIN), bannerController.deleteBanner);
 
-router.get('/', auth(...ALL_ADMINISTRATOR_LEVELS), bannerController.getBanners);
+router.get('/', auth(UserRole.ADMIN, UserRole.SUPER_ADMIN), bannerController.getBanners);
 router.get('/public', bannerController.getPublicBanners);
-router.get('/:id', auth(...ALL_ADMINISTRATOR_LEVELS), bannerController.getBannerById);
+router.get('/:id', auth(UserRole.ADMIN, UserRole.SUPER_ADMIN), bannerController.getBannerById);
 
 const bannerRouter = router;
+export default bannerRouter;

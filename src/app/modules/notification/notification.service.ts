@@ -34,11 +34,16 @@ class NotificationService {
 
   async notificationsSetAsRead(authUser: IAuthUser, payload: { ids: string[] }) {
     const { userId, role } = authUser;
+
+    const uId = role === UserRole.CUSTOMER ? { customerId: userId } : { administratorId: userId };
     await NotificationModel.updateMany(
       {
         _id: { $in: payload.ids.map((_) => objectId(_)) },
+        ...uId,
       },
-      role === UserRole.CUSTOMER ? { customerId: userId } : { administratorId: userId }
+      {
+        isRead: true,
+      }
     );
 
     return await NotificationModel.find({ _id: { $in: payload.ids.map((_) => objectId(_)) } });

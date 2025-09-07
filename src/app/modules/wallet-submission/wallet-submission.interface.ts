@@ -22,7 +22,7 @@ export enum WalletSubmissionStatus {
 
 export type CreateWalletSubmissionPayload = Pick<
   WalletSubmission,
-  'methodId' | 'number' | 'amount' | 'note'
+  'methodId' | 'number' | 'transactionId' | 'amount' | 'note'
 >;
 
 export type DeclineWalletSubmissionPayload = {

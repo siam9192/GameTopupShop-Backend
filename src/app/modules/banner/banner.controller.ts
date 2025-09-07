@@ -6,7 +6,7 @@ import bannerService from './banner.service';
 
 class BannerController {
   createBanner = catchAsync(async (req, res) => {
-    const result = bannerService.createBannerIntoDB(req.body);
+    const result = await bannerService.createBannerIntoDB(req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.CREATED,
       data: result,
@@ -14,7 +14,7 @@ class BannerController {
     });
   });
   updateBanner = catchAsync(async (req, res) => {
-    const result = bannerService.updateBannerIntoDB(req.params.id, req.body);
+    const result = await bannerService.updateBannerIntoDB(req.params.id, req.body);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -23,7 +23,7 @@ class BannerController {
   });
 
   deleteBanner = catchAsync(async (req, res) => {
-    const result = bannerService.deleteBannerFromDB(req.params.id);
+    const result = await bannerService.deleteBannerFromDB(req.params.id);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -32,15 +32,15 @@ class BannerController {
   });
 
   getBanners = catchAsync(async (req, res) => {
-    const result = bannerService.getBannersFromDB(paginationOptionPicker(req.query));
+    const result = await bannerService.getBannersFromDB(paginationOptionPicker(req.query));
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
-      data: result,
+      ...result,
       message: 'Banners retrieved Successfully',
     });
   });
   getPublicBanners = catchAsync(async (req, res) => {
-    const result = bannerService.getPublicBannersFromDB();
+    const result = await bannerService.getPublicBannersFromDB();
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
@@ -48,7 +48,7 @@ class BannerController {
     });
   });
   getBannerById = catchAsync(async (req, res) => {
-    const result = bannerService.getBannerByIdFromDB(req.params.id);
+    const result = await bannerService.getBannerByIdFromDB(req.params.id);
     sendSuccessResponse(res, {
       statusCode: httpStatus.OK,
       data: result,
