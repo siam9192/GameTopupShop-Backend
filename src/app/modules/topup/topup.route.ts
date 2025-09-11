@@ -29,6 +29,7 @@ router.delete('/:id', topupController.softDeleteTopup);
 router.get('/', topupController.getTopups);
 router.get('/public', topupController.getPublicTopups);
 router.get('/featured', topupController.getFeaturedTopups);
+router.get('/popular', topupController.getPopularTopups);
 router.get('/:id', topupController.getTopupById);
 
 const topupRouter = router;

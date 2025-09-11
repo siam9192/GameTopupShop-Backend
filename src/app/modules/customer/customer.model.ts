@@ -57,7 +57,7 @@ const CustomerModelSchema = new Schema<Customer>(
     },
     email: {
       type: String,
-      required: true,
+      default: null,
       minLength: 1,
       maxLength: 100,
       trim: true,

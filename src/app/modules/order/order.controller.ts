@@ -33,6 +33,18 @@ class OrderController {
       message: 'Orders retrieved successfully',
     });
   });
+  getRecentOrders = catchAsync(async (req, res) => {
+    const result = await orderService.getRecentOrdersFromDB(
+      req.params.recentDate,
+      paginationOptionPicker(req.query)
+    );
+    sendSuccessResponse(res, {
+      statusCode: httpStatus.OK,
+      ...result,
+      message: 'Recent orders retrieved successfully',
+    });
+  });
+
   getMyOrders = catchAsync(async (req, res) => {
     const result = await orderService.getMyOrdersFromDB(
       req.user,
@@ -45,7 +57,18 @@ class OrderController {
       message: 'Orders retrieved successfully',
     });
   });
-
+  getMyRecentOrders = catchAsync(async (req, res) => {
+    const result = await orderService.getMyRecentOrdersFromDB(
+      req.user,
+      req.params.recentDate,
+      paginationOptionPicker(req.query)
+    );
+    sendSuccessResponse(res, {
+      statusCode: httpStatus.OK,
+      ...result,
+      message: 'Recent orders retrieved successfully',
+    });
+  });
   getOrderById = catchAsync(async (req, res) => {
     const result = await orderService.getOrderByIdFromDB(req.user, req.params.id);
     sendSuccessResponse(res, {

@@ -63,6 +63,8 @@ export type OrdersFilterPayload = Partial<{
   maxAmount: string;
   status: OrderStatus;
   category: ProductCategory;
+  createdAt: string;
+  updatedAt: string;
 }>;
 
 export type UpdateOrderStatusPayload = {

@@ -4,13 +4,14 @@ import { objectId } from '../../helpers';
 import bycryptHelpers from '../../helpers/bycryptHelpers';
 import jwtHelpers from '../../helpers/jwtHelpers';
 import httpStatus from '../../shared/http-status';
+import { FacebookProfile, GoogleProfile } from '../../types/provider.type';
 import AdministratorModel from '../administrator/administrator.model';
 import { CreateCustomerPayload } from '../customer/customer.interface';
 import CustomerModel from '../customer/customer.model';
 import customerService from '../customer/customer.service';
-import { AccountStatus, UserRole } from '../user/user.interface';
+import { AccountStatus, Provider, UserRole } from '../user/user.interface';
 
-import { AuthUser, ChangePasswordPayload, SigninPayload } from './auth.interface';
+import { AuthUser, CallbackPayload, ChangePasswordPayload, SigninPayload } from './auth.interface';
 
 class AuthService {
   async customerSignup(payload: CreateCustomerPayload) {
@@ -32,7 +33,10 @@ class AuthService {
     }
 
     // Compare the provided password with the stored hashed password
-    const isMatchPassword = await bycryptHelpers.compare(payload.password, customer.password);
+    const isMatchPassword = await bycryptHelpers.compare(
+      payload.password,
+      customer.password as string
+    );
 
     if (!isMatchPassword) {
       throw new AppError(httpStatus.NOT_FOUND, 'Wrong password!');
@@ -131,7 +135,7 @@ class AuthService {
     }
 
     // Compare old password
-    const isPasswordMatch = await bycryptHelpers.compare(payload.oldPassword, password);
+    const isPasswordMatch = await bycryptHelpers.compare(payload.oldPassword, password as string);
     if (!isPasswordMatch) {
       throw new AppError(httpStatus.NOT_ACCEPTABLE, 'Incorrect current password.');
     }
@@ -184,6 +188,82 @@ class AuthService {
     } catch (error) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Invalid or expired refresh token.');
     }
+  }
+
+  async callback(payload: CallbackPayload) {
+    let customer;
+    if (payload.provider === 'google') {
+      const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: {
+          Authorization: `Bearer ${payload.access_token}`,
+        },
+      });
+      const profile: GoogleProfile = await res.json();
+
+      customer = await CustomerModel.findOne({
+        email: profile.email,
+        status: { $ne: AccountStatus.DELETED },
+      });
+      if (!customer) {
+        customer = await customerService.createCustomer({
+          email: profile.email,
+          googleId: profile.sub,
+          name: {
+            first: profile.given_name,
+            last: profile.family_name,
+          },
+          provider: Provider.GOOGLE,
+          profilePicture: profile.picture,
+        });
+      }
+    } else if (payload.provider === 'facebook') {
+      const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: {
+          Authorization: `Bearer ${payload.access_token}`,
+        },
+      });
+      const profile: FacebookProfile = await res.json();
+
+      customer = await CustomerModel.findOne({
+        facebookId: profile.id,
+        status: { $ne: AccountStatus.DELETED },
+      });
+      if (!customer) {
+        customer = await customerService.createCustomer({
+          facebookId: profile.id,
+          name: {
+            first: profile.first_name!,
+            last: profile.last_name || '',
+          },
+          provider: Provider.FACEBOOK,
+        });
+      }
+    }
+
+    // Prepare the token payload
+    const tokenPayload = {
+      userId: customer!._id,
+      role: UserRole.CUSTOMER,
+    };
+
+    // Generate access token
+    const accessToken = await jwtHelpers.generateToken(
+      tokenPayload,
+      envConfig.jwt.accessTokenSecret as string,
+      envConfig.jwt.accessTokenExpireTime as string
+    );
+
+    // Generate refresh token
+    const refreshToken = await jwtHelpers.generateToken(
+      tokenPayload,
+      envConfig.jwt.refreshTokenSecret as string,
+      envConfig.jwt.refreshTokenExpireTime as string
+    );
+
+    const result = {
+      accessToken,
+      refreshToken,
+    };
   }
 }
 

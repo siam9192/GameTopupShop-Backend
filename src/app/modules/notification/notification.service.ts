@@ -48,6 +48,34 @@ class NotificationService {
 
     return await NotificationModel.find({ _id: { $in: payload.ids.map((_) => objectId(_)) } });
   }
+  async getMyUnreadNotifications(authUser: IAuthUser, paginationOptions: IPaginationOptions) {
+    const whereConditions: Record<string, unknown> = {
+      isRead: false,
+    };
+    if (authUser.role === UserRole.CUSTOMER) {
+      whereConditions.customerId = authUser.userId;
+    } else {
+      whereConditions.administratorId = authUser.userId;
+    }
+
+    const { page, skip, limit, sortBy, sortOrder } = calculatePagination(paginationOptions);
+
+    const notifications = await NotificationModel.find(whereConditions)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalResults = await NotificationModel.countDocuments(whereConditions);
+
+    return {
+      data: notifications,
+      meta: {
+        page,
+        limit,
+        totalResults,
+      },
+    };
+  }
 }
 
 export default new NotificationService();

@@ -48,6 +48,15 @@ class AuthController {
       data: result,
     });
   });
+
+  callback = catchAsync(async (req, res) => {
+    const result = await authService.callback(req.body);
+    sendSuccessResponse(res, {
+      message: 'Access token retrieved successfully',
+      statusCode: httpStatus.OK,
+      data: result,
+    });
+  });
 }
 
 export default new AuthController();

@@ -14,6 +14,8 @@ import { platform } from 'os';
 import { calculatePagination } from '../../helpers/paginationHelper';
 import { objectId } from '../../helpers';
 import { UserRole } from '../user/user.interface';
+import OrderModel from '../order/order.model';
+import { ProductCategory } from '../order/order.interface';
 
 class TopupService {
   async createTopupIntoDB(payload: CreateTopupPayload) {
@@ -197,6 +199,47 @@ class TopupService {
       .limit(limit);
     const totalResults = await TopupModel.countDocuments();
     const total = await TopupModel.countDocuments();
+    return {
+      data: topups,
+      meta: {
+        page,
+        limit,
+        totalResults,
+        total,
+      },
+    };
+  }
+
+  async getPopularTopupsFromDB(paginationOptions: IPaginationOptions) {
+    const mostPopularGroup = await OrderModel.aggregate([
+      {
+        $match: {
+          'product.category': ProductCategory.TOP_UP,
+        },
+      },
+      {
+        $group: {
+          _id: '$product.productId',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { count: -1 }, // sort by popularity
+      },
+    ]);
+    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
+
+    const whereConditions = {
+      _id: {
+        $in: mostPopularGroup.map((_) => _._id),
+      },
+    };
+    const topups = await TopupModel.find(whereConditions)
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(limit);
+    const totalResults = await TopupModel.countDocuments(whereConditions);
+    const total = await TopupModel.countDocuments(whereConditions);
     return {
       data: topups,
       meta: {

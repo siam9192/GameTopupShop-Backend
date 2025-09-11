@@ -6,14 +6,14 @@ export interface Customer {
   _id: ObjectId;
   name: Name;
   fullName: string;
-  profilePicture: string;
+  profilePicture?: string;
   wallet: ObjectId;
   ordersCount: number;
   phone?: string;
-  email: string;
-  password: string;
-  googleId: string;
-  facebookId: string;
+  email?: string;
+  password?: string;
+  googleId?: string;
+  facebookId?: string;
   provider: Provider;
   passwordLastChangedAt: Date;
   status: AccountStatus;
@@ -22,8 +22,11 @@ export interface Customer {
 }
 
 export interface CreateCustomerPayload
-  extends Pick<Customer, 'name' | 'email' | 'password' | 'googleId' | 'facebookId'> {
-  provider?: Provider;
+  extends Pick<
+    Customer,
+    'name' | 'email' | 'password' | 'googleId' | 'facebookId' | 'profilePicture'
+  > {
+  provider: Provider;
 }
 
 export interface CustomersFilterPayload

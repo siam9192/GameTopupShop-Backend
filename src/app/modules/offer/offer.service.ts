@@ -14,6 +14,8 @@ import { calculatePagination } from '../../helpers/paginationHelper';
 import { objectId } from '../../helpers';
 import { UserRole } from '../user/user.interface';
 import { x } from 'pdfkit';
+import OrderModel from '../order/order.model';
+import { OrderStatus, ProductCategory } from '../order/order.interface';
 
 class OfferService {
   async createOfferIntoDB(payload: CreateOfferPayload) {
@@ -216,6 +218,46 @@ class OfferService {
       .limit(limit);
     const totalResults = await OfferModel.countDocuments();
     const total = await OfferModel.countDocuments();
+    return {
+      data: offers,
+      meta: {
+        page,
+        limit,
+        totalResults,
+        total,
+      },
+    };
+  }
+  async getPopularOffersFromDB(paginationOptions: IPaginationOptions) {
+    const mostPopularGroup = await OrderModel.aggregate([
+      {
+        $match: {
+          'product.category': ProductCategory.OFFER,
+        },
+      },
+      {
+        $group: {
+          _id: '$product.productId',
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { count: -1 }, // sort by popularity
+      },
+    ]);
+    const { page, limit, skip, sortBy, sortOrder } = calculatePagination(paginationOptions);
+
+    const whereConditions = {
+      _id: {
+        $in: mostPopularGroup.map((_) => _._id),
+      },
+    };
+    const offers = await OfferModel.find(whereConditions)
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(limit);
+    const totalResults = await OfferModel.countDocuments(whereConditions);
+    const total = await OfferModel.countDocuments(whereConditions);
     return {
       data: offers,
       meta: {

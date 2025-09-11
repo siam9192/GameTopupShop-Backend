@@ -30,6 +30,7 @@ router.delete('/:id', offerController.softDeleteOffer);
 router.get('/', offerController.getOffers);
 router.get('/public', offerController.getPublicOffers);
 router.get('/ending-soon', offerController.getEndingSoonOffers);
+router.get('/popular', offerController.getPopularOffers);
 router.get('/:id', offerController.getOfferById);
 
 const offerRouter = router;

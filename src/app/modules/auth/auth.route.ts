@@ -25,6 +25,8 @@ router.post(
   authController.administratorSignin
 );
 
+router.post('/callback', authController.callback);
+
 router.patch(
   '/change-password',
   auth(...ALL_ROLES),

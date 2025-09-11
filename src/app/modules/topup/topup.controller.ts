@@ -81,6 +81,15 @@ class TopupController {
       message: 'Topups retrieved successfully',
     });
   });
+
+  getPopularTopups = catchAsync(async (req, res) => {
+    const result = await topupService.getPopularTopupsFromDB(paginationOptionPicker(req.query));
+    sendSuccessResponse(res, {
+      statusCode: httpStatus.OK,
+      ...result,
+      message: 'Topups retrieved successfully',
+    });
+  });
 }
 
 export default new TopupController();

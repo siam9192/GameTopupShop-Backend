@@ -28,9 +28,11 @@ class CustomerService {
     } else if (googleId) {
       query = { googleId };
       newCustomer.googleId = googleId;
+      newCustomer.provider = Provider.GOOGLE;
     } else if (facebookId) {
       query = { facebookId };
       newCustomer.facebookId = facebookId;
+      newCustomer.provider = Provider.FACEBOOK;
     } else {
       throw new AppError(httpStatus.BAD_REQUEST, 'Invalid customer payload');
     }

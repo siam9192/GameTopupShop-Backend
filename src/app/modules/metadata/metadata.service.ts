@@ -1,8 +1,10 @@
+import { subDays } from 'date-fns';
 import AppError from '../../Errors/AppError';
 import { objectId } from '../../helpers';
 import httpStatus from '../../shared/http-status';
 import { IAuthUser } from '../../types';
 import CustomerModel from '../customer/customer.model';
+import { OfferStatus } from '../offer/offer.interface';
 import OfferModel from '../offer/offer.model';
 import { OrderStatus } from '../order/order.interface';
 import OrderModel from '../order/order.model';
@@ -26,19 +28,21 @@ class MetadataService {
       status: { $ne: OrderStatus.PENDING },
     });
 
-    const revenue = await OrderModel.aggregate([
-      {
-        $match: {
-          status: OrderStatus.COMPLETED,
+    const revenue = (
+      await OrderModel.aggregate([
+        {
+          $match: {
+            status: OrderStatus.COMPLETED,
+          },
         },
-      },
-      {
-        $group: {
-          _id: null,
-          total: { $sum: '$payment.amount' },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$payment.amount' },
+          },
         },
-      },
-    ]);
+      ])
+    )[0].total;
 
     const customers = await CustomerModel.countDocuments({
       status: { $ne: AccountStatus.DELETED },
@@ -69,13 +73,21 @@ class MetadataService {
       status: { $ne: OrderStatus.PENDING },
     });
 
-    const revenue = await OrderModel.aggregate([
-      {
-        $match: {
-          status: { $ne: OrderStatus.COMPLETED },
+    const revenue = (
+      await OrderModel.aggregate([
+        {
+          $match: {
+            status: OrderStatus.COMPLETED,
+          },
         },
-      },
-    ]);
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$payment.amount' },
+          },
+        },
+      ])
+    )[0].total;
 
     const customers = await CustomerModel.countDocuments({
       status: { $ne: AccountStatus.DELETED },
@@ -153,35 +165,39 @@ class MetadataService {
       status: OrderStatus.COMPLETED,
     });
 
-    const ordersAmount = await OrderModel.aggregate([
-      {
-        $match: {
-          customerId: objectId(authUser.userId),
-          status: { $in: [OrderStatus.RUNNING, OrderStatus.COMPLETED] },
+    const ordersAmount = (
+      await OrderModel.aggregate([
+        {
+          $match: {
+            customerId: objectId(authUser.userId),
+            status: { $in: [OrderStatus.RUNNING, OrderStatus.COMPLETED] },
+          },
         },
-      },
-      {
-        $group: {
-          _id: null,
-          totalAmount: { $sum: '$payment.amount' },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: '$payment.amount' },
+          },
         },
-      },
-    ]);
+      ])
+    )[0].totalAmount;
 
-    const pendingWalletAmount = await WalletSubmissionModel.aggregate([
-      {
-        $match: {
-          customerId: objectId(authUser.userId),
-          status: WalletSubmissionStatus.PENDING,
+    const pendingWalletAmount = (
+      await WalletSubmissionModel.aggregate([
+        {
+          $match: {
+            customerId: objectId(authUser.userId),
+            status: WalletSubmissionStatus.PENDING,
+          },
         },
-      },
-      {
-        $group: {
-          _id: null,
-          totalAmount: { $sum: '$amount' },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: '$amount' },
+          },
         },
-      },
-    ]);
+      ])
+    )[0].totalAmount;
 
     return {
       walletBalance: wallet.balance,
@@ -214,6 +230,40 @@ class MetadataService {
       customers,
       administrators,
       blockedUsers,
+    };
+  }
+  async getProductsMetadata() {
+    const topups = await TopupModel.countDocuments({
+      status: { $ne: TopupStatus.DELETED },
+    });
+    const offers = await OfferModel.countDocuments({
+      status: { $ne: TopupStatus.DELETED },
+    });
+
+    const inactiveTopups = await TopupModel.countDocuments({
+      status: TopupStatus.ACTIVE,
+    });
+
+    const inactiveOffers = await TopupModel.countDocuments({
+      status: OfferStatus.Paused,
+    });
+
+    const newTopups = await TopupModel.countDocuments({
+      createdAt: { $gte: subDays(new Date(), 15) }, // last 30 days
+      status: { $ne: TopupStatus.DELETED },
+    }).sort({ createdAt: -1 });
+
+    const newOffers = await OfferModel.countDocuments({
+      createdAt: { $gte: subDays(new Date(), 15) }, // last 30 days
+      status: { $ne: TopupStatus.DELETED },
+    }).sort({ createdAt: -1 });
+
+    return {
+      products: topups + offers,
+      inactive: inactiveTopups + inactiveOffers,
+      topups,
+      offers,
+      newProducts: newTopups + newOffers,
     };
   }
 }

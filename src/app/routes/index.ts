@@ -15,6 +15,8 @@ import notificationRouter from '../modules/notification/notification.route';
 import currencyRouter from '../modules/currency/curremcy.route';
 import userRouter from '../modules/user/user.route';
 import appSettingRouter from '../modules/app-setting/app-setting.route';
+import metadataRouter from '../modules/metadata/metadata.router';
+import statisticsRouter from '../modules/statistics/statistics.route';
 
 type TModuleRoutes = { path: string; router: IRouter }[];
 const router = Router();
@@ -23,7 +25,7 @@ const moduleRoutes: TModuleRoutes = [
     path: '/auth',
     router: authRouter,
   },
-   {
+  {
     path: '/users',
     router: userRouter,
   },
@@ -79,9 +81,17 @@ const moduleRoutes: TModuleRoutes = [
     path: '/currencies',
     router: currencyRouter,
   },
-   {
+  {
     path: '/app-settings',
     router: appSettingRouter,
+  },
+  {
+    path: '/metadata',
+    router: metadataRouter,
+  },
+  {
+    path: '/statistics',
+    router: statisticsRouter,
   },
 ];
 

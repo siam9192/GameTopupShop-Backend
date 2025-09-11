@@ -9,9 +9,10 @@ import orderValidations from './order.validation';
 const router = Router();
 
 router.get('/', auth(...ALL_ADMINISTRATOR_LEVELS), orderController.getOrders);
+router.get('/recent:recentDate', auth(UserRole.CUSTOMER), orderController.getRecentOrders);
 router.get('/my', auth(UserRole.CUSTOMER), orderController.getMyOrders);
+router.get('/my/recent:recentDate', auth(UserRole.CUSTOMER), orderController.getMyRecentOrders);
 router.get('/:id', auth(...ALL_ROLES), orderController.getOrderById);
-
 router.post('/', auth(UserRole.CUSTOMER), orderController.createOrder);
 router.patch(
   '/status',

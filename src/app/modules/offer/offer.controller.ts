@@ -81,6 +81,14 @@ class OfferController {
       message: 'Offers retrieved successfully',
     });
   });
+  getPopularOffers = catchAsync(async (req, res) => {
+    const result = await offerService.getPopularOffersFromDB(paginationOptionPicker(req.query));
+    sendSuccessResponse(res, {
+      statusCode: httpStatus.OK,
+      data: result,
+      message: 'Offers retrieved successfully',
+    });
+  });
 }
 
 export default new OfferController();

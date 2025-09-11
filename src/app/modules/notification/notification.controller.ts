@@ -24,6 +24,18 @@ class NotificationController {
       message: 'Notifications retrieved Successfully',
     });
   });
+
+  getMyUnreadNotifications = catchAsync(async (req, res) => {
+    const result = await notificationService.getMyUnreadNotifications(
+      req.user,
+      paginationOptionPicker(req.query)
+    );
+    sendSuccessResponse(res, {
+      statusCode: httpStatus.OK,
+      data: result,
+      message: 'Notifications retrieved Successfully',
+    });
+  });
 }
 
 export default new NotificationController();

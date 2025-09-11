@@ -19,6 +19,7 @@ import { calculatePagination } from '../../helpers/paginationHelper';
 import { UserRole } from '../user/user.interface';
 import NotificationModel from '../notification/notification.model';
 import { NotificationCategory } from '../notification/notification.interface';
+import { z } from 'zod';
 
 class OrderService {
   async createOrderIntoDB(authUser: IAuthUser, payload: CreateOrderPayload) {
@@ -71,7 +72,8 @@ class OrderService {
   }
 
   async getOrdersFromDB(filterPayload: OrdersFilterPayload, paginationOptions: IPaginationOptions) {
-    const { id, customerId, minAmount, maxAmount, status, ...restPayload } = filterPayload;
+    const { id, customerId, minAmount, maxAmount, status, createdAt, updatedAt, ...restPayload } =
+      filterPayload;
     const whereConditions: Record<string, any> = {
       ...restPayload,
     };
@@ -265,6 +267,88 @@ class OrderService {
       });
     }
     return await OrderModel.findByIdAndUpdate(id, { status }, { new: true });
+  }
+
+  async getRecentOrdersFromDB(recentDate: string | Date, paginationOptions: IPaginationOptions) {
+    if (!recentDate && z.date().safeParse(new Date(recentDate)).success) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Invalid date');
+    }
+
+    const { page, skip, limit, sortBy, sortOrder } = calculatePagination(paginationOptions);
+
+    const whereConditions = {
+      createdAt: {
+        $gt: new Date(recentDate),
+      },
+    };
+    const orders = await OrderModel.find(whereConditions)
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(limit)
+      .populate(['customerId'])
+      .lean();
+    const totalResults = await OrderModel.countDocuments(whereConditions);
+
+    const total = await OrderModel.countDocuments();
+    const data: any[] = orders.map((order) => {
+      const { customerId, ...rest } = order;
+      return {
+        ...rest,
+        customerId: customerId._id,
+        customer: customerId,
+      };
+    });
+    const meta = {
+      page,
+      limit,
+      totalResults,
+      total,
+    };
+
+    return {
+      data,
+      meta,
+    };
+  }
+  async getMyRecentOrdersFromDB(
+    authUser: IAuthUser,
+    recentDate: string | Date,
+    paginationOptions: IPaginationOptions
+  ) {
+    if (!recentDate && z.date().safeParse(new Date(recentDate)).success) {
+      throw new AppError(httpStatus.FORBIDDEN, 'Invalid date');
+    }
+
+    const { page, skip, limit, sortBy, sortOrder } = calculatePagination(paginationOptions);
+
+    const whereConditions = {
+      customerId: objectId(authUser.userId),
+      createdAt: {
+        $gt: new Date(recentDate),
+      },
+    };
+    const orders = await OrderModel.find(whereConditions)
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const totalResults = await OrderModel.countDocuments(whereConditions);
+
+    const total = await OrderModel.countDocuments();
+
+    const meta = {
+      page,
+      limit,
+      totalResults,
+      total,
+    };
+
+    const data: any = orders;
+    return {
+      data,
+      meta,
+    };
   }
 }
 
